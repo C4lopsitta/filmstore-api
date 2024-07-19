@@ -1,6 +1,6 @@
 import sqlite3
 from Entities.Film import Film, FilmType
-from Entities.FilmRoll import FilmRoll
+from Entities.FilmRoll import FilmRoll, DevelopmentStatus
 from Entities.Picture import Picture
 
 connection = sqlite3.connect('./filmstore.sqlite')
@@ -103,4 +103,31 @@ def fetch_filmroll(filmroll_id: int) -> FilmRoll:
                     camera=row[4])
 
 
+def fetch_filmrolls() -> list[FilmRoll]:
+    rows = cursor.execute('SELECT * FROM filmrolls;')
+
+    filmrolls: list[FilmRoll] = []
+
+    for row in rows:
+        pictures: list[Picture] = []
+        picrows = cursor.execute(
+            f"SELECT pictures.* FROM pictures, pic_film_rel WHERE pic_film_rel.filmroll = {row[0]} AND pic_film_rel.picture = pictures.id;"
+        )
+        for picrow in picrows:
+            pictures.append(Picture(db_id=picrow[0],
+                                    description=picrow[1],
+                                    location=picrow[2],
+                                    aperture=picrow[3],
+                                    shutter_speed=picrow[4],
+                                    posted=True if picrow[5] == 1 else False,
+                                    printed=True if picrow[6] == 1 else False,
+                                    thumbnail=picrow[7]))
+        filmrolls.append(FilmRoll(db_id=row[0],
+                                  film=fetch_film(row[1]),
+                                  archival_identifier=row[2],
+                                  pictures=pictures,
+                                  status=DevelopmentStatus(row[3]),
+                                  camera=row[4]))
+
+    return filmrolls
 

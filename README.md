@@ -48,7 +48,26 @@ Response:
 Returns all the film rolls stored.
 Response:
 ```json
-to be defined
+{
+  "status": 200,
+  "message": "",
+  "filmrolls": [
+    {
+      "film": {
+        "id": 123,
+        "name": "Ilford HP5+",
+        "ISO": 400,
+        "development_info": "",
+        "type": 1
+      },
+      "pictures": [123, 124, 125],
+      "status": 3,
+      "camera": "Olympus OM2n",
+      "identifier": "Archival Identifier",
+      "db_id": 123
+    }
+  ]
+}
 ```
 
 ### GET /filmrolls/{id}

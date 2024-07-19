@@ -61,7 +61,20 @@ async def get_film(film_id: int):
 
 @app.get("/filmrolls")
 async def list_filmrolls():
-    return JSONResponse(status_code=200, content={})
+    try:
+        filmrolls = db.fetch_filmrolls()
+    except Exception as e:
+        print(e)
+        return JSONResponse(status_code=500, content={
+            "status": 500,
+            "message": str(e)
+        })
+
+    return JSONResponse(status_code=200, content={
+        "status": 200,
+        "message": "Successfully fetched filmrolls",
+        "filmrolls": [filmroll.to_dict() for filmroll in filmrolls]
+    })
 
 
 @app.get("/filmrolls/{filmrollid}")

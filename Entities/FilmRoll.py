@@ -29,3 +29,13 @@ class FilmRoll:
 
     def to_tuple(self) -> tuple:
         return self.db_id, self.camera, self.film, self.archival_identifier, self.pictures, self.status.value
+
+    def to_dict(self) -> dict:
+        return {
+            "camera": self.camera,
+            "film": self.film.to_dict(),
+            "status": self.status.value,
+            "db_id": self.db_id,
+            "pictures": [picture.db_id for picture in self.pictures],
+            "archival_identifier": self.archival_identifier,
+        }
