@@ -48,9 +48,7 @@ Response:
 Returns all the film rolls stored.
 Response:
 ```json
-{
-  "to be defined": ""
-}
+to be defined
 ```
 
 ### GET /filmrolls/{id}
@@ -137,5 +135,13 @@ Request:
   "identifier": "Archival identifier",
   "pictures": [123, 124, 125],
   "status": 5
+}
+```
+Response:
+```json
+{
+  "status": 200,
+  "message": "",
+  "filmroll_id": 123
 }
 ```
