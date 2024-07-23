@@ -20,7 +20,8 @@ Response:
       "name": "Ilford HP5+",
       "ISO": 400,
       "development_info": "",
-      "type": 1
+      "type": 1,
+      "format": 1
     }
   ]
 }
@@ -39,7 +40,8 @@ Response:
     "name": "Ilford HP5+",
     "ISO": 400,
     "development_info": "",
-    "type": 1
+    "type": 1,
+    "format": 1
   }
 }
 ```
@@ -58,7 +60,8 @@ Response:
         "name": "Ilford HP5+",
         "ISO": 400,
         "development_info": "",
-        "type": 1
+        "type": 1,
+        "format": 1
       },
       "pictures": [123, 124, 125],
       "status": 3,
@@ -83,7 +86,8 @@ Response:
     "name": "Ilford HP5+",
     "ISO": 400,
     "development_info": "",
-    "type": 1
+    "type": 1,
+    "format": 1
   },
   "pictures": [123, 124, 125],
   "filmroll_status": 3,
@@ -107,7 +111,8 @@ Request:
   "name": "Lomography Berlin Kino",
   "iso": 400,
   "development_info": "ISO 100 pull gives a thick grain",
-  "type": 1
+  "type": 1,
+  "format": 1
 }
 ```
 Response:
@@ -164,3 +169,25 @@ Response:
   "filmroll_id": 123
 }
 ```
+
+## Enumeration definitions
+A value of 0 is always to be considered `undefined`.
+### Film Format (format)
+1. 35mm
+2. 120
+3. 127
+4. 110
+5. Sheet film
+
+### Film Type (type)
+1. Black and White Panchromatic
+2. Black and White Orthochromatic
+3. Color
+4. Infrared
+
+### Development Status (filmroll_status)
+1. In camera
+2. To be developed
+3. Developed
+4. Scanned
+5. Archived

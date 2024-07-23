@@ -6,7 +6,7 @@ from fastapi import FastAPI, Request, UploadFile, Form
 from fastapi.responses import JSONResponse
 
 import db
-from Entities.Film import Film, FilmType
+from Entities.Film import Film, FilmType, FilmFormat
 from Entities.FilmRoll import FilmRoll, DevelopmentStatus
 from Entities.Picture import Picture
 
@@ -105,7 +105,8 @@ async def create_film(request: Request):
     film = Film(name=req_json["name"],
                 iso=req_json["iso"],
                 development_info=req_json["development_info"],
-                type=FilmType(req_json["type"]))
+                type=FilmType(req_json["type"]),
+                format=FilmFormat(req_json["format"]))
 
     try:
         db.add_film(film)
