@@ -1,7 +1,7 @@
 import sqlite3
 import subprocess
 
-from Entities.Film import Film, FilmType
+from Entities.Film import Film, FilmType, FilmFormat
 from Entities.FilmRoll import FilmRoll, DevelopmentStatus
 from Entities.Picture import Picture
 
@@ -9,18 +9,16 @@ connection = sqlite3.connect('./filmstore.sqlite')
 
 cursor = connection.cursor()
 
+cursor.execute("PRAGMA foreign_keys = ON;")
 cursor.execute("""
-PRAGMA foreign_keys = ON;
-
 CREATE TABLE if not exists films(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     iso INTEGER NOT NULL,
     info TEXT,
-    type INTEGER NOT NULL,
-    format INTEGER
-);
-
+    type INTEGER NOT NULL
+);""")
+cursor.execute("""
 CREATE TABLE if not exists pictures(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     description TEXT,
@@ -30,8 +28,8 @@ CREATE TABLE if not exists pictures(
     posted INTEGER,
     printed INTEGER,
     thumbnail TEXT NOT NULL
-);
-
+);""")
+cursor.execute("""
 CREATE TABLE if not exists filmrolls(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     film INTEGER,
@@ -39,23 +37,26 @@ CREATE TABLE if not exists filmrolls(
     status INTEGER NOT NULL,
     camera TEXT,
     FOREIGN KEY (film) REFERENCES films(id)
-);
-
+);""")
+cursor.execute("""
 CREATE TABLE if not exists pic_film_rel(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     filmroll INTEGER,
     picture INTEGER,
     FOREIGN KEY (filmroll) REFERENCES filmrolls(id),
     FOREIGN KEY (picture) REFERENCES pictures(id)
-);
-""")
+);""")
+try:
+    cursor.execute("ALTER TABLE films ADD COLUMN format INTEGER NOT NULL DEFAULT 0;")
+except sqlite3.OperationalError:
+    pass
 
 connection.commit()
 
 
 def add_film(film: Film):
     cursor.execute(
-        f"INSERT INTO films VALUES(NULL, '{film.name}', {film.iso}, '{film.development_info}', {film.type.value});"
+        f"INSERT INTO films VALUES(NULL, '{film.name}', {film.iso}, '{film.development_info}', {film.type.value}, {film.format.value});"
     )
     connection.commit()
 
@@ -69,8 +70,9 @@ def fetch_film(film_id: int) -> Film:
                 name=row[1],
                 iso=row[2],
                 development_info=row[3],
-                type=FilmType(row[4]))
-
+                type=FilmType(row[4]),
+                format=FilmFormat(row[5]))
+# TODO)) Fix API
 
 def fetch_films(filter_type: FilmType = None) -> list[Film]:
     if filter_type is None:
@@ -85,6 +87,7 @@ def fetch_films(filter_type: FilmType = None) -> list[Film]:
         films.append(Film(db_id=row[0],
                           name=row[1],
                           iso=row[2],
+                          format=FilmFormat(row[5]),
                           development_info=row[3],
                           type=FilmType(row[4])))
 
