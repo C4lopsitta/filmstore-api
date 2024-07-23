@@ -125,20 +125,21 @@ async def create_film(request: Request):
 async def upload_picture(file: UploadFile, req: str = Form()):
     req_json = json.loads(req)
 
-    if file.content_type == 'image/jpeg':
+    if file.content_type == 'image/jpeg' or file.content_type == 'image/png':
         # Run compression script
-        filename = f"{uuid.uuid4().hex}.jpeg"
+        filename = f"{uuid.uuid4().hex}."
+        filename += "jpeg" if file.content_type == 'image/jpeg' else "png"
         with open(".temp/" + filename, 'wb') as f:
             f.write(await file.read())
 
         subprocess.run(
-            ["./scripts/jpeg.sh", f".temp/{filename}", f"./pictures/{filename}"]
+            ["./scripts/img.sh", f".temp/{filename}", f"./pictures/{filename}"]
         )
     else: # TODO)) ADD FILM FORMAT
         return JSONResponse(status_code=400,
                             content={
                                 "status": 400,
-                                "message": "Only JPEG is supported"
+                                "message": "Only JPEG and PNG are supported"
                             })
 
     picture = Picture(thumbnail=filename,
