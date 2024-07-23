@@ -1,4 +1,6 @@
 import sqlite3
+import subprocess
+
 from Entities.Film import Film, FilmType
 from Entities.FilmRoll import FilmRoll, DevelopmentStatus
 from Entities.Picture import Picture
@@ -6,6 +8,8 @@ from Entities.Picture import Picture
 connection = sqlite3.connect('./filmstore.sqlite')
 
 cursor = connection.cursor()
+
+subprocess.run(['sqlite3', 'filmstore.sqlite', '-init', './init.sql'])
 
 
 def add_film(film: Film):

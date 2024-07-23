@@ -134,7 +134,7 @@ async def upload_picture(file: UploadFile, req: str = Form()):
         subprocess.run(
             ["./scripts/jpeg.sh", f".temp/{filename}", f"./pictures/{filename}"]
         )
-    else:
+    else: # TODO)) ADD FILM FORMAT
         return JSONResponse(status_code=400,
                             content={
                                 "status": 400,

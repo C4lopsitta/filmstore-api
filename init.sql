@@ -5,7 +5,8 @@ CREATE TABLE if not exists films(
     name TEXT NOT NULL,
     iso INTEGER NOT NULL,
     info TEXT,
-    type INTEGER NOT NULL
+    type INTEGER NOT NULL,
+    format INTEGER
 );
 
 CREATE TABLE if not exists pictures(
