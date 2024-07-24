@@ -4,6 +4,7 @@ import uuid
 
 from fastapi import FastAPI, Request, UploadFile, Form
 from fastapi.responses import JSONResponse
+from starlette.responses import HTMLResponse
 
 import db
 from Entities.Film import Film, FilmType, FilmFormat
@@ -12,16 +13,32 @@ from Entities.Picture import Picture
 
 app = FastAPI()
 
-
 @app.get("/")
 async def root():
+    return HTMLResponse(content="""
+    <!DOCTYPE html>
+    <html>
+        <head>
+            <meta charset="utf-8">
+            <title>Filmstore</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+        </head>
+        <body>
+            <h1>Filmstore</h1>
+            <p>Everything should be working</p>
+        </body>
+    </html>
+    """)
+
+@app.get("/api/v1")
+async def api_root():
     return JSONResponse(status_code=200, content={
         "status": 200,
         "message": "Everything is working!"
     })
 
 
-@app.get("/films")
+@app.get("/api/v1/films")
 async def list_films():
     try:
         films = db.fetch_films()
@@ -41,7 +58,7 @@ async def list_films():
     })
 
 
-@app.get("/films/{film_id}")
+@app.get("/api/v1/films/{film_id}")
 async def get_film(film_id: int):
     try:
         film = db.fetch_film(film_id=film_id)
@@ -59,7 +76,7 @@ async def get_film(film_id: int):
     })
 
 
-@app.get("/filmrolls")
+@app.get("/api/v1/filmrolls")
 async def list_filmrolls():
     try:
         filmrolls = db.fetch_filmrolls()
@@ -77,7 +94,7 @@ async def list_filmrolls():
     })
 
 
-@app.get("/filmrolls/{filmrollid}")
+@app.get("/api/v1/filmrolls/{filmrollid}")
 async def get_filmroll(filmrollid: int):
     filmroll = db.fetch_filmroll(filmrollid)
 
@@ -93,12 +110,12 @@ async def get_filmroll(filmrollid: int):
     })
 
 
-@app.get("/pictures/{pictureid}")
+@app.get("/api/v1/pictures/{pictureid}")
 async def get_picture(pictureid: int):
     return JSONResponse(status_code=200, content={})
 
 
-@app.post("/films")
+@app.post("/api/v1/films")
 async def create_film(request: Request):
     req_json = await request.json()
 
@@ -122,7 +139,7 @@ async def create_film(request: Request):
     })
 
 
-@app.post("/pictures")
+@app.post("/api/v1/pictures")
 async def upload_picture(file: UploadFile, req: str = Form()):
     req_json = json.loads(req)
 
@@ -166,7 +183,7 @@ async def upload_picture(file: UploadFile, req: str = Form()):
     })
 
 
-@app.post("/filmrolls")
+@app.post("/api/v1/filmrolls")
 async def add_filmroll(request: Request):
     req_json = await request.json()
 

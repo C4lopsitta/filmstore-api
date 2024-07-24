@@ -4,10 +4,10 @@ An API to access an SQLite DB on a raspberry that manages my film rolls so i can
 ## API Documentation
 Multiple endpoints are available.
 
-### GET /
+### GET /api/v1
 Returns a JSON with 200
 
-### GET /films
+### GET /api/v1/films
 Returns a list of all Films (as in brands)
 Response:
 ```json
@@ -27,7 +27,7 @@ Response:
 }
 ```
 
-### GET /films/{id}
+### GET /api/v1/films/{id}
 Returns a single film (as in brand)
 Response:
 ```json
@@ -46,7 +46,7 @@ Response:
 }
 ```
 
-### GET /filmrolls
+### GET /api/v1/filmrolls
 Returns all the film rolls stored.
 Response:
 ```json
@@ -73,7 +73,7 @@ Response:
 }
 ```
 
-### GET /filmrolls/{id}
+### GET /api/v1/filmrolls/{id}
 Returns a single film roll
 Response:
 ```json
@@ -96,14 +96,14 @@ Response:
 }
 ```
 
-### GET /pictures/{id}
+### GET /api/v1/pictures/{id}
 Returns a single image details with the image encoded in Base64 in JPEG format.
 Response:
 ```json
 to be defined
 ```
 
-### POST /films
+### POST /api/v1/films
 Adds a new film brand.
 Request:
 ```json
@@ -124,7 +124,7 @@ Response:
 }
 ```
 
-### POST /pictures
+### POST /api/v1/pictures
 Adds a new image with details.
 HTTP Form Request:
 - file: contains image file (currently only `image/jpeg` is supported)
@@ -149,7 +149,7 @@ Response:
 }
 ```
 
-### POST /filmrolls
+### POST /api/v1/filmrolls
 Adds a new film roll.
 Request:
 ```json
