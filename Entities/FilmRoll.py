@@ -37,5 +37,5 @@ class FilmRoll:
             "status": self.status.value,
             "db_id": self.db_id,
             "pictures": [picture.db_id for picture in self.pictures],
-            "archival_identifier": self.archival_identifier,
+            "identifier": self.archival_identifier,
         }
