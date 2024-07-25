@@ -156,7 +156,13 @@ def fetch_filmrolls() -> list[FilmRoll]:
 
     filmrolls: list[FilmRoll] = []
 
+    rolls_rows = []
+
     for row in rows:
+        rolls_rows.append(row)
+
+    for row in rolls_rows:
+        print(row)
         pictures: list[Picture] = []
         picrows = cursor.execute(
             f"SELECT pictures.* FROM pictures, pic_film_rel WHERE pic_film_rel.filmroll = {row[0]} AND pic_film_rel.picture = pictures.id;"
