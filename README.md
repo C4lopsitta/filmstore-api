@@ -119,8 +119,27 @@ Response:
 ```json
 {
   "status": 200,
-  "message": "",
-  "request_json": "json of request"
+  "message": ""
+}
+```
+
+### POST /api/v1/films/{id}
+Alters a film stock with the given data.
+Request:
+```json
+{
+  "name": "Lomography Berlin Kino",
+  "iso": 400,
+  "development_info": "ISO 100 pull gives a thick grain",
+  "type": 1,
+  "format": 1 
+}
+```
+Response:
+```json
+{
+  "status": 200,
+  "message": "Film roll {id} has been updated successfully"
 }
 ```
 
@@ -167,6 +186,24 @@ Response:
   "status": 200,
   "message": "",
   "filmroll_id": 123
+}
+```
+
+### DELETE /api/v1/films/{id}
+Deletes permanently the specified film ID. Do note that any film roll referencing the stock to delete will also be 
+permanently deleted with no way of recovering them. This means that any picture in those film rolls will also be removed.
+Response:
+```json
+{
+  "status": 200,
+  "message": "Film stock deleted successfully",
+  "deleted_item": {
+    "name": "Lomography Berlin Kino",
+    "iso": 400,
+    "development_info": "ISO 100 pull gives a thick grain",
+    "type": 1,
+    "format": 1 
+  }
 }
 ```
 

@@ -1,4 +1,5 @@
 import json
+import os
 import subprocess
 import uuid
 
@@ -139,6 +140,7 @@ async def create_film(request: Request):
     })
 
 
+# Consider switch to base64 in json for simplicity reasons
 @app.post("/api/v1/pictures")
 async def upload_picture(file: UploadFile, req: str = Form()):
     req_json = json.loads(req)
@@ -208,4 +210,21 @@ async def add_filmroll(request: Request):
         "status": 200,
         "message": "Filmroll added",
         "filmroll_id": id
+    })
+
+@app.post("/api/v1/films/{id}")
+async def update_film(request: Request, id: int):
+    pass
+
+@app.delete("/api/v1/films/{id}")
+async def delete_film(id: int):
+    resp_json = db.fetch_film(id).to_dict()
+
+    pictures_to_delete, deleted_films = db.delete_film_stock(id)
+    for picture in pictures_to_delete:
+        os.remove(f"./pictures/{picture}")
+
+    return JSONResponse(status_code=200, content={
+        "status": 200,
+        "message": f"Film deleted successfully along {deleted_films} film rolls and {len(pictures_to_delete)} pictures",
     })
