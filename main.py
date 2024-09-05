@@ -13,7 +13,13 @@ from Entities.Film import Film, FilmType, FilmFormat
 from Entities.FilmRoll import FilmRoll, DevelopmentStatus
 from Entities.Picture import Picture
 
-app = FastAPI()
+app = FastAPI(title="FilmStore",
+              description="""An API to manage Film rolls, stocks and the images you shot on them.""",
+              version="1.0.0",
+              license_info={
+                "name": "GNU GPLv3",
+                "url": "https://gnu.org/copyright/",
+              })
 # app.mount("./pictures", StaticFiles(directory="pictures"), name="pictures")
 
 @app.get("/")
@@ -112,7 +118,7 @@ async def get_filmroll(filmrollid: int):
     })
 
 
-@app.get("/api/v1/picutre/{picture_id}")
+@app.get("/api/v1/picutres/{picture_id}")
 async def get_picture(picture_id: int):
     try:
         picture = db.fetch_picture(picture_id)
