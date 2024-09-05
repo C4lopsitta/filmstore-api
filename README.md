@@ -1,6 +1,28 @@
 # Filmstore - API
 An API to access an SQLite DB on a raspberry that manages my film rolls so i can find the photos i took.
 
+## Running the API
+A running script, which expects to have a python VENV available in the `venv` folder, is available.
+You can run in with:
+```bash
+./filmstore.sh
+```
+If automated running on boot is needed, you can create a user systemd service.
+```
+[Unit]
+Description=Filmstore DB API
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+ExecStart=/home/c4lopsitta/filmstore/filmstore.sh
+Restart=always
+RestartSec=12
+
+[Install]
+WantedBy=default.target
+```
+
 ## API Documentation
 Multiple endpoints are available.
 
