@@ -112,7 +112,7 @@ async def get_filmroll(filmrollid: int):
     })
 
 
-@app.get("/api/v1/picutres/{picture_id}")
+@app.get("/api/v1/picutre/{picture_id}")
 async def get_picture(picture_id: int):
     try:
         picture = db.fetch_picture(picture_id)
@@ -132,7 +132,7 @@ async def get_picture(picture_id: int):
 
 
 @app.get("/api/v1/pictures/file/{filename}")
-async def get_picture(filename: int):
+async def get_picture(filename: str):
     return FileResponse(status_code=200,
                         media_type='image/jpeg',
                         path=f'./pictures/{filename}')
