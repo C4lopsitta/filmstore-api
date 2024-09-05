@@ -7,12 +7,12 @@ from pydantic import BaseModel
 class Films(BaseModel):
     name: str
     iso: int
-    development_info: str | None = None
+    development_info: str = ""
     type: int
     format: int
 
 
-FilmsExample: Annotated[
+FilmsBaseModel: Annotated[
     Films,
     Body(
         example={
