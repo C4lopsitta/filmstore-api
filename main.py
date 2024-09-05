@@ -8,7 +8,7 @@ from fastapi.responses import JSONResponse, FileResponse
 from starlette.responses import HTMLResponse
 
 import db
-from ApiExamples.Films import FilmsBaseModel
+from BaseModels.Films import FilmsBaseModel
 from Entities.Film import Film, FilmType, FilmFormat
 from Entities.FilmRoll import FilmRoll, DevelopmentStatus
 from Entities.Picture import Picture

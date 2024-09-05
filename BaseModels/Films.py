@@ -12,7 +12,7 @@ class Films(BaseModel):
     format: int
 
 
-FilmsBaseModel: Annotated[
+FilmsBaseModel = Annotated[
     Films,
     Body(
         example={
