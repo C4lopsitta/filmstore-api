@@ -44,7 +44,8 @@ async def root():
 async def api_root():
     return JSONResponse(status_code=200, content={
         "success": True,
-        "status": "Everything is working!"
+        "status": "Everything is working!",
+        "api_version": "1.0.0"
     })
 
 
@@ -155,14 +156,14 @@ async def create_film(request: FilmsBaseModel):
 
     # TODO)) ADD id and response id
     try:
-        db.add_film(film)
+        db_id = db.add_film(film)
     except Exception as e:
         return JSONResponse(status_code=500, content={
             "message": str(e)
         })
     return JSONResponse(status_code=201, content={
         "success": True,
-        "request_json": req_json
+        "film_id": db_id,
     })
 
 
@@ -181,7 +182,7 @@ async def upload_picture(file: UploadFile, req: str = Form()):
         subprocess.run(
             ["./scripts/img.sh", f".temp/{filename}", f"./pictures/{filename}"]
         )
-    else: # TODO)) ADD FILM FORMAT
+    else:  # TODO)) ADD FILM FORMAT
         return JSONResponse(status_code=400,
                             content={
                                 "success": False,

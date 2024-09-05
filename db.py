@@ -54,11 +54,13 @@ except sqlite3.OperationalError:
 connection.commit()
 
 
-def add_film(film: Film):
+def add_film(film: Film) -> int:
     cursor.execute(
         f"INSERT INTO films VALUES(NULL, '{film.name}', {film.iso}, '{film.development_info}', {film.type.value}, {film.format.value});"
     )
     connection.commit()
+    cursor.execute("SELECT last_insert_rowid() FROM films;")
+    return cursor.fetchone()[0]
 
 
 def fetch_film(film_id: int) -> Film:
@@ -72,7 +74,7 @@ def fetch_film(film_id: int) -> Film:
                 development_info=row[3],
                 type=FilmType(row[4]),
                 format=FilmFormat(row[5]))
-# TODO)) Fix API
+
 
 def fetch_films(filter_type: FilmType = None) -> list[Film]:
     if filter_type is None:
