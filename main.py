@@ -8,7 +8,7 @@ from fastapi.responses import JSONResponse, FileResponse
 from starlette.responses import HTMLResponse
 
 import db
-from ApiExamples.Films import Films
+from ApiExamples.Films import FilmsBaseModel
 from Entities.Film import Film, FilmType, FilmFormat
 from Entities.FilmRoll import FilmRoll, DevelopmentStatus
 from Entities.Picture import Picture
@@ -146,12 +146,12 @@ async def get_picture(filename: str):
 
 
 @app.post("/api/v1/films")
-async def create_film(request: Films):
+async def create_film(request: FilmsBaseModel):
     film = Film(name=request.name,
                 iso=request.iso,
                 development_info=request.development_info,
                 type=FilmType(request.type),
-                format=FilmFormat(request.format))
+                format=FilmFormat(request.format),)
 
     # TODO)) ADD id and response id
     try:
@@ -162,6 +162,7 @@ async def create_film(request: Films):
         })
     return JSONResponse(status_code=201, content={
         "success": True,
+        "request_json": req_json
     })
 
 
