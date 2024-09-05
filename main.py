@@ -4,7 +4,8 @@ import subprocess
 import uuid
 
 from fastapi import FastAPI, Request, UploadFile, Form
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 from starlette.responses import HTMLResponse
 
 import db
@@ -13,10 +14,11 @@ from Entities.FilmRoll import FilmRoll, DevelopmentStatus
 from Entities.Picture import Picture
 
 app = FastAPI()
+# app.mount("./pictures", StaticFiles(directory="pictures"), name="pictures")
 
 @app.get("/")
 async def root():
-    return HTMLResponse(content="""
+    return HTMLResponse(status_code= 200, content="""
     <!DOCTYPE html>
     <html>
         <head>
@@ -34,8 +36,8 @@ async def root():
 @app.get("/api/v1")
 async def api_root():
     return JSONResponse(status_code=200, content={
-        "status": 200,
-        "message": "Everything is working!"
+        "success": True,
+        "status": "Everything is working!"
     })
 
 
@@ -46,15 +48,14 @@ async def list_films():
     except Exception as e:
         print(e)
         return JSONResponse(status_code=500, content={
-            "status": 500,
-            "message": str(e)
+            "success": False,
+            "error": str(e)
         })
 
     json_films = [film.to_dict() for film in films]
 
     return JSONResponse(status_code=200, content={
-        "status": 200,
-        "message": "Successfully fetched films",
+        "success": True,
         "films": json_films
     })
 
@@ -66,13 +67,12 @@ async def get_film(film_id: int):
     except Exception as e:
         print(e)
         return JSONResponse(status_code=500, content={
-            "status": 500,
-            "message": str(e)
+            "success": False,
+            "error": str(e)
         })
 
     return JSONResponse(status_code=200, content={
-        "status": 200,
-        "message": "Successfully fetched film",
+        "success": True,
         "film": film.to_dict()
     })
 
@@ -84,24 +84,25 @@ async def list_filmrolls():
     except Exception as e:
         print(e)
         return JSONResponse(status_code=500, content={
-            "status": 500,
-            "message": str(e)
+            "success": False,
+            "error": str(e)
         })
 
     return JSONResponse(status_code=200, content={
-        "status": 200,
-        "message": "Successfully fetched filmrolls",
+        "success": True,
         "filmrolls": [filmroll.to_dict() for filmroll in filmrolls]
     })
 
 
 @app.get("/api/v1/filmrolls/{filmrollid}")
 async def get_filmroll(filmrollid: int):
-    filmroll = db.fetch_filmroll(filmrollid)
+    try:
+        filmroll = db.fetch_filmroll(filmrollid)
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"success": False, "error": str(e)})
 
     return JSONResponse(status_code=200, content={
-        "status": 200,
-        "message": "Successfully fetched filmroll",
+        "success": True,
         "id": filmrollid,
         "film": filmroll.film.to_dict(),
         "pictures": [picture.db_id for picture in filmroll.pictures],
@@ -111,9 +112,30 @@ async def get_filmroll(filmrollid: int):
     })
 
 
-@app.get("/api/v1/pictures/{pictureid}")
-async def get_picture(pictureid: int):
-    return JSONResponse(status_code=200, content={})
+@app.get("/api/v1/picutres/{picture_id}")
+async def get_picture(picture_id: int):
+    try:
+        picture = db.fetch_picture(picture_id)
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"success": False, "error": str(e)})
+    return JSONResponse(status_code=200, content={
+        "success": True,
+        "id": picture.db_id,
+        "thumbnail": picture.thumbnail,
+        "description": picture.description,
+        "location": picture.location,
+        "aperture": picture.aperture,
+        "shutter_speed": picture.shutter_speed,
+        "posted": picture.posted,
+        "printed": picture.printed,
+    })
+
+
+@app.get("/api/v1/pictures/file/{filename}")
+async def get_picture(filename: int):
+    return FileResponse(status_code=200,
+                        media_type='image/jpeg',
+                        path=f'./pictures/{filename}')
 
 
 @app.post("/api/v1/films")
@@ -126,16 +148,15 @@ async def create_film(request: Request):
                 type=FilmType(req_json["type"]),
                 format=FilmFormat(req_json["format"]))
 
+    # TODO)) ADD id and response id
     try:
         db.add_film(film)
     except Exception as e:
         return JSONResponse(status_code=500, content={
-            "status": 500,
             "message": str(e)
         })
-    return JSONResponse(status_code=200, content={
-        "status": 200,
-        "message": "Film created",
+    return JSONResponse(status_code=201, content={
+        "success": True,
         "request_json": req_json
     })
 
@@ -148,7 +169,7 @@ async def upload_picture(file: UploadFile, req: str = Form()):
     if file.content_type == 'image/jpeg' or file.content_type == 'image/png':
         # Run compression script
         filename = f"{uuid.uuid4().hex}."
-        filename += "jpeg" if file.content_type == 'image/jpeg' else "png"
+        filename += "jpeg" # if file.content_type == 'image/jpeg' else "png"
         with open(".temp/" + filename, 'wb') as f:
             f.write(await file.read())
 
@@ -158,8 +179,8 @@ async def upload_picture(file: UploadFile, req: str = Form()):
     else: # TODO)) ADD FILM FORMAT
         return JSONResponse(status_code=400,
                             content={
-                                "status": 400,
-                                "message": "Only JPEG and PNG are supported"
+                                "success": False,
+                                "error": "Only JPEG and PNG are supported"
                             })
 
     picture = Picture(thumbnail=filename,
@@ -174,13 +195,12 @@ async def upload_picture(file: UploadFile, req: str = Form()):
         insert_id = db.add_picture(picture)
     except Exception as e:
         return JSONResponse(status_code=500, content={
-            "status": 500,
-            "message": str(e)
+            "success": False,
+            "error": str(e)
         })
 
-    return JSONResponse(status_code=200, content={
-        "status": 200,
-        "message": "Picture stored successfully!",
+    return JSONResponse(status_code=201, content={
+        "success": True,
         "picture_id": insert_id
     })
 
@@ -202,13 +222,12 @@ async def add_filmroll(request: Request):
         id = db.add_filmroll(filmroll)
     except Exception as e:
         return JSONResponse(status_code=500, content={
-            "status": 500,
-            "message": str(e)
+            "success": False,
+            "error": str(e)
         })
 
-    return JSONResponse(status_code=200, content={
-        "status": 200,
-        "message": "Filmroll added",
+    return JSONResponse(status_code=201, content={
+        "success": True,
         "filmroll_id": id
     })
 
@@ -218,13 +237,17 @@ async def update_film(request: Request, id: int):
 
 @app.delete("/api/v1/films/{id}")
 async def delete_film(id: int):
-    resp_json = db.fetch_film(id).to_dict()
-
-    pictures_to_delete, deleted_films = db.delete_film_stock(id)
-    for picture in pictures_to_delete:
-        os.remove(f"./pictures/{picture}")
+    try:
+        resp_json = db.fetch_film(id).to_dict()
+        pictures_to_delete, deleted_films = db.delete_film_stock(id)
+        for picture in pictures_to_delete:
+            os.remove(f"./pictures/{picture}")
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"success": False, "error": str(e)})
 
     return JSONResponse(status_code=200, content={
-        "status": 200,
-        "message": f"Film deleted successfully along {deleted_films} film rolls and {len(pictures_to_delete)} pictures",
+        "id": {id},
+        "success": True,
+        "deleted_images": {len(pictures_to_delete)},
+        "deleted_films": deleted_films
     })

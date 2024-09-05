@@ -105,6 +105,19 @@ def add_picture(picture: Picture) -> int:
     return cursor.fetchone()[0]
 
 
+def fetch_picture(picture_id: int) -> Picture:
+    cursor.execute(f"SELECT * FROM pictures WHERE id=?;", (picture_id,))
+    picture = cursor.fetchone()
+    return Picture(db_id=picture[0],
+                   description=picture[1],
+                   location=picture[2],
+                   aperture=picture[3],
+                   shutter_speed=picture[4],
+                   posted=True if picture[5] > 0 else False,
+                   printed=True if picture[6] > 0 else False,
+                   thumbnail=picture[7])
+
+
 def add_filmroll(filmroll: FilmRoll) -> int:
     cursor.execute("INSERT INTO filmrolls VALUES(NULL, ?, ?, ?, ?)",
                    (filmroll.film.db_id, filmroll.archival_identifier, filmroll.status.value, filmroll.camera))
