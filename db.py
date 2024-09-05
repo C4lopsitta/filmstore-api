@@ -9,6 +9,7 @@ connection = sqlite3.connect('./filmstore.sqlite')
 
 cursor = connection.cursor()
 
+# region: init
 cursor.execute("PRAGMA foreign_keys = ON;")
 cursor.execute("""
 CREATE TABLE if not exists films(
@@ -53,6 +54,25 @@ except sqlite3.OperationalError:
 
 connection.commit()
 
+
+def seed():
+    if len(cursor.execute("SELECT * FROM films;")) == 0:
+        default_rolls = [
+            Film(name="Ilford HP5+", iso=400, development_info="", type=FilmType.BLACK_WHITE_PAN, format=FilmFormat.THIRTY_FIVE_MM),
+            Film(name="Ilford FP4+", iso=125, development_info="", type=FilmType.BLACK_WHITE_PAN, format=FilmFormat.THIRTY_FIVE_MM),
+            Film(name="Kodak Gold", iso=200, development_info="", type=FilmType.COLOR, format=FilmFormat.THIRTY_FIVE_MM),
+            Film(name="Kodak Ultramax", iso=400, development_info="", type=FilmType.COLOR, format=FilmFormat.THIRTY_FIVE_MM),
+            Film(name="Ilford SFX", iso=200, development_info="", type=FilmType.INFRARED, format=FilmFormat.THIRTY_FIVE_MM),
+            Film(name="Harman Phoenix", iso=200, development_info="", type=FilmType.COLOR, format=FilmFormat.THIRTY_FIVE_MM),
+            Film(name="Fomapan 100", iso=100, development_info="", type=FilmType.BLACK_WHITE_PAN, format=FilmFormat.ONE_TWENTY)
+        ]
+        for film in default_rolls:
+            add_film(film)
+        connection.commit()
+
+
+seed()
+# endregion: init
 
 def add_film(film: Film) -> int:
     cursor.execute(
