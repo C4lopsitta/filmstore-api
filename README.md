@@ -1,6 +1,32 @@
 # Filmstore - API
 An API to access an SQLite DB on a raspberry that manages my film rolls so i can find the photos i took.
 
+## Running the API
+A running script, which expects to have a python VENV available in the `venv` folder, is available.
+You can run in with:
+```bash
+./filmstore.sh
+```
+If automated running on boot is needed, you can create a user systemd service.
+```
+[Unit]
+Description=Filmstore DB API
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+ExecStart=/PATH-TO-FILMSTORE/filmstore/filmstore.sh
+Restart=always
+RestartSec=12
+
+[Install]
+WantedBy=default.target
+```
+Additionally, an Avahi mDNS discovery service is available, you can install it through the `discovery_service_create.sh` 
+script. This script will automatically install the needed packages (`avahi-daemon` and `avahi-utils`) and copy the config 
+file `config/filmstore_discovery.service` into the Avahi configuration folder, lastly it will enable and start the mDNS 
+Avahi service.
+
 ## API Documentation
 Multiple endpoints are available.
 
