@@ -5,15 +5,21 @@ import uuid
 
 from fastapi import FastAPI, Request, UploadFile, Form
 from fastapi.responses import JSONResponse, FileResponse
-from fastapi.staticfiles import StaticFiles
 from starlette.responses import HTMLResponse
 
 import db
+from ApiExamples.Films import Films
 from Entities.Film import Film, FilmType, FilmFormat
 from Entities.FilmRoll import FilmRoll, DevelopmentStatus
 from Entities.Picture import Picture
 
-app = FastAPI()
+app = FastAPI(title="FilmStore",
+              description="""An API to manage Film rolls, stocks and the images you shot on them.""",
+              version="1.0.0",
+              license_info={
+                "name": "GNU GPLv3",
+                "url": "https://gnu.org/copyright/",
+              })
 # app.mount("./pictures", StaticFiles(directory="pictures"), name="pictures")
 
 @app.get("/")
@@ -32,6 +38,7 @@ async def root():
         </body>
     </html>
     """)
+
 
 @app.get("/api/v1")
 async def api_root():
@@ -112,7 +119,7 @@ async def get_filmroll(filmrollid: int):
     })
 
 
-@app.get("/api/v1/picutre/{picture_id}")
+@app.get("/api/v1/picutres/{picture_id}")
 async def get_picture(picture_id: int):
     try:
         picture = db.fetch_picture(picture_id)
@@ -139,14 +146,12 @@ async def get_picture(filename: str):
 
 
 @app.post("/api/v1/films")
-async def create_film(request: Request):
-    req_json = await request.json()
-
-    film = Film(name=req_json["name"],
-                iso=req_json["iso"],
-                development_info=req_json["development_info"],
-                type=FilmType(req_json["type"]),
-                format=FilmFormat(req_json["format"]))
+async def create_film(request: Films):
+    film = Film(name=request.name,
+                iso=request.iso,
+                development_info=request.development_info,
+                type=FilmType(request.type),
+                format=FilmFormat(request.format))
 
     # TODO)) ADD id and response id
     try:
@@ -157,7 +162,6 @@ async def create_film(request: Request):
         })
     return JSONResponse(status_code=201, content={
         "success": True,
-        "request_json": req_json
     })
 
 
