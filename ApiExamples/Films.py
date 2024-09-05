@@ -1,9 +1,10 @@
 from typing import Annotated
 
 from fastapi import Body
+from pydantic import BaseModel
 
 
-class Films:
+class Films(BaseModel):
     name: str
     iso: int
     development_info: str | None = None
