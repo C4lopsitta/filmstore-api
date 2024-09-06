@@ -120,7 +120,20 @@ async def get_filmroll(filmrollid: int):
     })
 
 
-@app.get("/api/v1/picutres/{picture_id}")
+@app.get("/api/v1/pictures/")
+async def list_pictures():
+    try:
+        pictures = db.fetch_pictures()
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"success": False, "error": str(e)})
+
+    pictures_jsons = []
+    for picture in pictures:
+        pictures_jsons.append(picture.to_dict())
+
+
+
+@app.get("/api/v1/pictures/{picture_id}")
 async def get_picture(picture_id: int):
     try:
         picture = db.fetch_picture(picture_id)
