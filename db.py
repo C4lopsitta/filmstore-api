@@ -56,7 +56,8 @@ connection.commit()
 
 
 def seed():
-    if len(cursor.execute("SELECT * FROM films;")) == 0:
+    rs = cursor.execute("SELECT * FROM films;").fetchall()
+    if len(rs) == 0:
         default_rolls = [
             Film(name="Ilford HP5+", iso=400, development_info="", type=FilmType.BLACK_WHITE_PAN, format=FilmFormat.THIRTY_FIVE_MM),
             Film(name="Ilford FP4+", iso=125, development_info="", type=FilmType.BLACK_WHITE_PAN, format=FilmFormat.THIRTY_FIVE_MM),
