@@ -86,7 +86,7 @@ async def get_film(film_id: int):
 
 
 @app.get("/api/v1/filmrolls")
-async def list_filmrolls(stock: int):
+async def list_filmrolls(stock: int = 0):
     try:
         filmrolls = db.fetch_filmrolls(stock_filter=stock)
     except Exception as e:
@@ -103,7 +103,7 @@ async def list_filmrolls(stock: int):
 
 
 @app.get("/api/v1/filmrolls/{filmrollid}")
-async def get_filmroll(filmrollid: int = 0):
+async def get_filmroll(filmrollid: int):
     try:
         filmroll = db.fetch_filmroll(filmrollid)
     except Exception as e:
