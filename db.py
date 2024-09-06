@@ -187,8 +187,11 @@ def fetch_filmroll(filmroll_id: int) -> FilmRoll:
                     camera=row[4])
 
 
-def fetch_filmrolls() -> list[FilmRoll]:
-    rows = cursor.execute('SELECT * FROM filmrolls;')
+def fetch_filmrolls(stock_filter: int) -> list[FilmRoll]:
+    if stock_filter == 0:
+        rows = cursor.execute('SELECT * FROM filmrolls;')
+    else:
+        rows = cursor.execute(f"SELECT * FROM filmrolls WHERE film = {stock_filter};")
 
     filmrolls: list[FilmRoll] = []
 
@@ -200,9 +203,20 @@ def fetch_filmrolls() -> list[FilmRoll]:
     for row in rolls_rows:
         print(row)
         pictures: list[Picture] = []
-        picrows = cursor.execute(
-            f"SELECT pictures.* FROM pictures, pic_film_rel WHERE pic_film_rel.filmroll = {row[0]} AND pic_film_rel.picture = pictures.id;"
-        )
+        if stock_filter == 0:
+            picrows = cursor.execute(
+                f"SELECT pictures.* FROM pictures, pic_film_rel WHERE "
+                f"pic_film_rel.filmroll = {row[0]} "
+                f"AND pic_film_rel.picture = pictures.id;"
+            )
+        else:
+            picrows = cursor.execute(
+                f"SELECT pictures.* FROM pictures, pic_film_rel, filmrolls WHERE "
+                f"pic_film_rel.filmroll = {row[0]} "
+                f"AND pic_film_rel.picture = pictures.id AND "
+                f"filmrolls.film = {stock_filter};"
+            )
+
         for picrow in picrows:
             pictures.append(Picture(db_id=picrow[0],
                                     description=picrow[1],
