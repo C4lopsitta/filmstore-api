@@ -86,9 +86,9 @@ async def get_film(film_id: int):
 
 
 @app.get("/api/v1/filmrolls")
-async def list_filmrolls():
+async def list_filmrolls(stock: int):
     try:
-        filmrolls = db.fetch_filmrolls()
+        filmrolls = db.fetch_filmrolls(stock_filter=stock)
     except Exception as e:
         print(e)
         return JSONResponse(status_code=500, content={
@@ -167,7 +167,6 @@ async def create_film(request: FilmsBaseModel):
     })
 
 
-# Consider switch to base64 in json for simplicity reasons
 @app.post("/api/v1/pictures")
 async def upload_picture(file: UploadFile, req: str = Form()):
     req_json = json.loads(req)
@@ -182,6 +181,7 @@ async def upload_picture(file: UploadFile, req: str = Form()):
         subprocess.run(
             ["./scripts/img.sh", f".temp/{filename}", f"./pictures/{filename}"]
         )
+        os.remove(".temp/" + filename)
     else:  # TODO)) ADD FILM FORMAT
         return JSONResponse(status_code=400,
                             content={
