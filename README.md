@@ -11,6 +11,11 @@ An API to access an SQLite DB on a raspberry that manages my film rolls so i can
 - [ ] Projects to group images or rolls
 - [ ] Non-film images to allow for general image backups
 - [ ] Image albums
+- [ ] Docker container
+
+> [!Note]
+> Currently the API endpoints have changed *quite a bit* so the app is broken. Right now the API is my priority and I'll 
+> get back to the App as soon as the API has reached a good state.
 
 ## Running the API
 A running script, which expects to have a python VENV available in the `venv` folder, is available.

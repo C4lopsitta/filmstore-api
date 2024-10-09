@@ -173,7 +173,7 @@ async def get_picture(picture_id: int):
 async def get_picture(filename: str):
     return FileResponse(status_code=200,
                         media_type='image/jpeg',
-                        path=f'./pictures/{filename}')
+                        path=f'./pictures/{filename}.jpg')
 
 
 @app.get("/api/v1/pictures/hires/{filename}")
@@ -196,7 +196,9 @@ async def get_picture(filename: str):
     file = files[0]
 
     return FileResponse(status_code=200,
-                        media_type=list(mime_file_extension.keys())[list(mime_file_extension.values()).index(file.split('.')[-1])][0],
+                        media_type=
+                        list(mime_file_extension.keys())[list(mime_file_extension.values()).index(file.split('.')[-1])][
+                            0],
                         path=file)
 
 
@@ -252,12 +254,17 @@ async def upload_image_file(request: UploadFile):
             with open(f"{config.original_folder}{filename}", "wb") as f:
                 f.write(request.file.read())
 
+        if config.allow_raw_post_processing and use_processing:
+            # TODO)) Add postprocessing
+            pass
+
         if original_file_ext in raw_file_types.values():
-
-
-        subprocess.run(["./Scripts/img.sh",
-                        f"{config.temporary_files_folder}{filename}",
-                        f"./pictures/{filename.split('.')[0]}.jpg"])
+            # TODO)) Add image file transform into compressed jpg
+            pass
+        else:
+            subprocess.run(["./Scripts/create_thumbnail.sh",
+                            f"{config.temporary_files_folder}{filename}",
+                            f"./pictures/{filename.split('.')[0]}.jpg"])
 
         os.remove(f".temp/{filename}")
 
@@ -277,7 +284,7 @@ async def upload_image_file(request: UploadFile):
 
 @app.post("/api/v1/pictures")
 async def upload_picture(request):
-    req_json = await request._json()
+    req_json = await request.json()
 
     # else:  # TODO)) ADD FILM FORMAT
 
