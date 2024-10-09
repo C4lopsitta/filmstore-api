@@ -7,6 +7,8 @@ class Config:
         config_json = json.loads(file.read())
         file.close()
 
+        self._json = config_json
+
         images_config = config_json['images']
         data_config = config_json['data']
         authentication_config = config_json['authentication']
@@ -23,3 +25,6 @@ class Config:
 
         self.use_user_auth = authentication_config['use_user_auth']
         self.allow_user_creation = authentication_config['allow_user_creation']
+
+    def to_dict(self):
+        return self._json

@@ -1,6 +1,6 @@
-import db
+import Db
 from Entities.Film import Film, FilmType, FilmFormat
-from db import cursor, connection
+from Db import cursor, connection
 
 
 def create(film: Film) -> int:
@@ -52,9 +52,9 @@ def delete(film_stock_id: int,
 
     for row in rows_rolls_to_update:
         if delete_rolls:
-            delete_rolls_result: dict = db.film_rolls.delete(row[0], delete_pictures)
+            delete_rolls_result: dict = Db.film_rolls.delete(row[0], delete_pictures)
         else:
-            db.film_rolls.update(row[0],)  # TODO))
+            Db.film_rolls.update(row[0], )  # TODO))
 
     stock_to_delete = fetch(film_stock_id)
 

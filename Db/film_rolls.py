@@ -1,7 +1,7 @@
-import db
+import Db
 from Entities.FilmRoll import FilmRoll, DevelopmentStatus
 from Entities.Picture import Picture
-from db import cursor, connection, film_stocks
+from Db import cursor, connection, film_stocks
 
 
 def create(filmroll: FilmRoll) -> int:

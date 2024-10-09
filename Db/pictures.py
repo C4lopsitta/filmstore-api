@@ -1,5 +1,5 @@
 from Entities.Picture import Picture
-from db import cursor, connection
+from Db import cursor, connection
 
 
 def create(picture: Picture) -> int:

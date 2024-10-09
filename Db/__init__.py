@@ -1,7 +1,7 @@
 import sqlite3
 
 from Entities.Film import Film, FilmType, FilmFormat
-from db import film_stocks, film_rolls, pictures
+from Db import film_stocks, film_rolls, pictures
 
 
 connection = sqlite3.connect('./filmstore.sqlite')

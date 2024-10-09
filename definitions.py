@@ -14,7 +14,7 @@ mime_file_extension: dict[str, str] = {
     "image/x-canon-crw": "crw"
 }
 
-postprocess_file_types: dict[str, str] = {
+raw_file_types: dict[str, str] = {
     "image/x-nikon-nef": "nef",
     "image/x-adobe-dng": "dng",
     "image/x-canon-cr3": "cr3",
