@@ -34,7 +34,7 @@ RestartSec=12
 [Install]
 WantedBy=default.target
 ```
-Additionally, an Avahi mDNS discovery service is available, you can install it through the `discovery_service_create.sh` 
+Additionally, an Avahi mDNS discovery service is available, you can install it through the `scripts/discovery_service_create.sh` 
 script. This script will automatically install the needed packages (`avahi-daemon` and `avahi-utils`) and copy the config 
 file `config/filmstore_discovery.service` into the Avahi configuration folder, lastly it will enable and start the mDNS 
 Avahi service.
