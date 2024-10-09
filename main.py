@@ -12,6 +12,7 @@ from BaseModels.Films import FilmsBaseModel
 from Entities.Film import Film, FilmType, FilmFormat
 from Entities.FilmRoll import FilmRoll, DevelopmentStatus
 from Entities.Picture import Picture
+from definitions import mime_file_extension
 
 app = FastAPI(title="FilmStore",
               description="""An API to manage Film rolls, stocks and the images you shot on them.""",
@@ -22,9 +23,10 @@ app = FastAPI(title="FilmStore",
               })
 # app.mount("./pictures", StaticFiles(directory="pictures"), name="pictures")
 
+
 @app.get("/")
 async def root():
-    return HTMLResponse(status_code= 200, content="""
+    return HTMLResponse(status_code=200, content="""
     <!DOCTYPE html>
     <html>
         <head>
@@ -120,7 +122,7 @@ async def get_filmroll(filmrollid: int):
     })
 
 
-@app.get("/api/v1/pictures/")
+@app.get("/api/v1/pictures")
 async def list_pictures():
     try:
         pictures = db.fetch_pictures()
@@ -130,7 +132,12 @@ async def list_pictures():
     pictures_jsons = []
     for picture in pictures:
         pictures_jsons.append(picture.to_dict())
+        print(picture)
 
+    return JSONResponse(status_code=200, content={
+        "success": True,
+        "pictures": pictures_jsons
+    })
 
 
 @app.get("/api/v1/pictures/{picture_id}")
@@ -180,29 +187,46 @@ async def create_film(request: FilmsBaseModel):
     })
 
 
-@app.post("/api/v1/pictures")
-async def upload_picture(file: UploadFile, req: str = Form()):
-    req_json = json.loads(req)
+@app.put("/api/v1/pictures")
+async def upload_image_file(request: UploadFile):
+    if request.content_type not in mime_file_extension.keys():
+        tempfile_ext: str = mime_file_extension[request.content_type]
 
-    if file.content_type == 'image/jpeg' or file.content_type == 'image/png':
-        # Run compression script
         filename = f"{uuid.uuid4().hex}."
-        filename += "jpeg" # if file.content_type == 'image/jpeg' else "png"
-        with open(".temp/" + filename, 'wb') as f:
-            f.write(await file.read())
+
+        with open(f".temp/{filename}.{tempfile_ext}", "wb") as f:
+            f.write(request.file.read())
+
+
 
         subprocess.run(
             ["./scripts/img.sh", f".temp/{filename}", f"./pictures/{filename}"]
         )
-        os.remove(".temp/" + filename)
-    else:  # TODO)) ADD FILM FORMAT
-        return JSONResponse(status_code=400,
-                            content={
-                                "success": False,
-                                "error": "Only JPEG and PNG are supported"
-                            })
 
-    picture = Picture(thumbnail=filename,
+        os.remove(f".temp/{filename}")
+
+        return JSONResponse(status_code=200, content={
+            "success": True,
+            "image_filename": filename,
+            "thumbnail_path": f"/api/v1/pictures/file/{filename}",
+            "original_file": f"",
+            "awaiting_metadata": True
+        })
+    else:
+        return JSONResponse(status_code=400, content={
+            "success": False,
+            "error": f"Image formats supported are {mime_file_extension.values()}\nSent file uses {request.content_type}"
+        })
+
+
+@app.post("/api/v1/pictures")
+async def upload_picture(request):
+    req_json = await request.json()
+
+
+    # else:  # TODO)) ADD FILM FORMAT
+
+    picture = Picture(thumbnail="",
                       description=req_json["description"],
                       location=req_json["location"],
                       aperture=req_json["aperture"],

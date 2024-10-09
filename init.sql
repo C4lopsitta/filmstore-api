@@ -26,7 +26,7 @@ CREATE TABLE if not exists filmrolls(
     archival TEXT,
     status INTEGER NOT NULL,
     camera TEXT,
-    FOREIGN KEY (film) REFERENCES films(id)
+    FOREIGN KEY (film) REFERENCES film_stocks(id)
 );
 
 CREATE TABLE if not exists pic_film_rel(

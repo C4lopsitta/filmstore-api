@@ -1,6 +1,18 @@
 # Filmstore - API
 An API to access an SQLite DB on a raspberry that manages my film rolls so i can find the photos i took.
 
+## Planned features
+- [ ] Option to skip image processing
+- [ ] Option to store original size images
+- [ ] Folder settings for storing original sized images and thumbnails
+- [ ] Negative processing settings
+- [ ] User authentication with multiple user accounts
+- [ ] Film stock grouping (to group multiple versions of the same stock, like a group for Kodak Portra that contains all the ISOs and formats)
+- [ ] Projects to group images or rolls
+- [ ] Non-film images to allow for general image backups
+- [ ] Bulk image uploads
+- [ ] Image albums
+
 ## Running the API
 A running script, which expects to have a python VENV available in the `venv` folder, is available.
 You can run in with:
@@ -26,6 +38,17 @@ Additionally, an Avahi mDNS discovery service is available, you can install it t
 script. This script will automatically install the needed packages (`avahi-daemon` and `avahi-utils`) and copy the config 
 file `config/filmstore_discovery.service` into the Avahi configuration folder, lastly it will enable and start the mDNS 
 Avahi service.
+
+## Requirements
+Some additional software is needed to compress the pictures properly:
+- ImageMagik
+- DCRAW
+On a Debian/Ubuntu system these can be installed with:
+```bash
+apt-get install imagemagik dcraw
+```
+You can make do without these but image upload won't be supported. Plans on adding an option to skip image processing 
+exist but are not a priority as of today.
 
 ## API Documentation
 Multiple endpoints are available.

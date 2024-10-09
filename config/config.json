@@ -1,0 +1,10 @@
+{
+  "database_file_name": "./filmstore.sqlite",
+  "image_thumbnail_folder": "",
+  "image_original_folder": "",
+  "allow_raw_upload": true,
+  "allow_raw_post_processing": false,
+  "disable_thumbnail_compression": false,
+  "use_user_auth": false,
+  "allow_user_creation": false
+}
