@@ -1,3 +1,4 @@
+import db
 from Entities.Film import Film, FilmType, FilmFormat
 from db import cursor, connection
 
@@ -42,5 +43,44 @@ def fetch_all(filter_type: FilmType = None) -> list[Film]:
                           type=FilmType(row[4])))
 
     return films
+
+
+def delete(film_stock_id: int,
+           delete_rolls: bool = False,
+           delete_pictures: bool = False):
+    rows_rolls_to_update = cursor.execute(f"SELECT * FROM filmrolls WHERE film='{film_stock_id}';")
+
+    for row in rows_rolls_to_update:
+        if delete_rolls:
+            delete_rolls_result: dict = db.film_rolls.delete(row[0], delete_pictures)
+        else:
+            db.film_rolls.update(row[0],)  # TODO))
+
+    stock_to_delete = fetch(film_stock_id)
+
+    cursor.execute(f"DELETE FROM film_stocks WHERE film='{film_stock_id}';")
+
+    return {
+        "rolls_affected": len(rows_rolls_to_update) if delete_rolls else 0,
+        "pictures_affected": delete_rolls_result["pictures_affected"] if delete_pictures else 0,
+        "stock_deleted": stock_to_delete.to_dict()
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

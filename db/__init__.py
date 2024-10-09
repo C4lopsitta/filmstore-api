@@ -1,7 +1,8 @@
 import sqlite3
 
 from Entities.Film import Film, FilmType, FilmFormat
-from db import film_stocks
+from db import film_stocks, film_rolls, pictures
+
 
 connection = sqlite3.connect('./filmstore.sqlite')
 
@@ -54,6 +55,11 @@ def seed():
     rs = cursor.execute("SELECT * FROM films;").fetchall()
     if len(rs) == 0:
         default_rolls = [
+            Film(name="No Film",
+                 iso=0,
+                 development_info="",
+                 type=FilmType.UNDEFINED,
+                 format=FilmFormat.UNDEFINED),
             Film(name="Ilford HP5+",
                  iso=400, development_info="",
                  type=FilmType.BLACK_WHITE_PAN,

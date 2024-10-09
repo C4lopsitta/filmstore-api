@@ -1,3 +1,4 @@
+import db
 from Entities.FilmRoll import FilmRoll, DevelopmentStatus
 from Entities.Picture import Picture
 from db import cursor, connection, film_stocks
@@ -97,5 +98,7 @@ def fetch_all(stock_filter: int) -> list[FilmRoll]:
                                   camera=row[4]))
 
     return filmrolls
+
+
 
 

@@ -1,10 +1,8 @@
 {
-  "network_config": {
-    "port": 4200
-  },
   "images": {
-    "image_thumbnail_folder": "pictures/",
-    "image_original_folder": null,
+    "thumbnail_folder": "pictures/",
+    "temporary_files_folder": ".temp/",
+    "original_folder": null,
     "allow_raw_upload": true,
     "allow_raw_post_processing": false,
     "disable_thumbnail_compression": false,
@@ -16,5 +14,5 @@
   "authentication": {
     "use_user_auth": false,
     "allow_user_creation": false
-  },
+  }
 }

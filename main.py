@@ -12,6 +12,7 @@ from BaseModels.Films import FilmsBaseModel
 from Entities.Film import Film, FilmType, FilmFormat
 from Entities.FilmRoll import FilmRoll, DevelopmentStatus
 from Entities.Picture import Picture
+from config.config import Config
 from definitions import mime_file_extension
 
 app = FastAPI(title="FilmStore",
@@ -21,7 +22,7 @@ app = FastAPI(title="FilmStore",
                 "name": "GNU GPLv3",
                 "url": "https://gnu.org/copyright/",
               })
-# app.mount("./pictures", StaticFiles(directory="pictures"), name="pictures")
+config = Config(open(file="./config/config.json", mode="r"))
 
 
 @app.get("/")
@@ -51,10 +52,10 @@ async def api_root():
     })
 
 
-@app.get("/api/v1/films")
+@app.get("/api/v1/film_stocks")
 async def list_films():
     try:
-        films = db.fetch_films()
+        films = db.film_stocks.fetch_all()
     except Exception as e:
         print(e)
         return JSONResponse(status_code=500, content={
@@ -70,10 +71,10 @@ async def list_films():
     })
 
 
-@app.get("/api/v1/films/{film_id}")
+@app.get("/api/v1/film_stocks/{film_id}")
 async def get_film(film_id: int):
     try:
-        film = db.fetch_film(film_id=film_id)
+        film = db.film_stocks.fetch(film_id=film_id)
     except Exception as e:
         print(e)
         return JSONResponse(status_code=500, content={
@@ -87,10 +88,10 @@ async def get_film(film_id: int):
     })
 
 
-@app.get("/api/v1/filmrolls")
+@app.get("/api/v1/film_rolls")
 async def list_filmrolls(stock: int = 0):
     try:
-        filmrolls = db.fetch_filmrolls(stock_filter=stock)
+        film_rolls = db.film_rolls.fetch_all(stock_filter=stock)
     except Exception as e:
         print(e)
         return JSONResponse(status_code=500, content={
@@ -100,32 +101,32 @@ async def list_filmrolls(stock: int = 0):
 
     return JSONResponse(status_code=200, content={
         "success": True,
-        "filmrolls": [filmroll.to_dict() for filmroll in filmrolls]
+        "filmrolls": [filmroll.to_dict() for filmroll in film_rolls]
     })
 
 
-@app.get("/api/v1/filmrolls/{filmrollid}")
-async def get_filmroll(filmrollid: int):
+@app.get("/api/v1/film_rolls/{filmrollid}")
+async def get_film_roll(roll_id: int):
     try:
-        filmroll = db.fetch_filmroll(filmrollid)
+        film_roll = db.film_rolls.fetch(filmroll_id=roll_id)
     except Exception as e:
         return JSONResponse(status_code=500, content={"success": False, "error": str(e)})
 
     return JSONResponse(status_code=200, content={
         "success": True,
-        "id": filmrollid,
-        "film": filmroll.film.to_dict(),
-        "pictures": [picture.db_id for picture in filmroll.pictures],
-        "filmroll_status": filmroll.status,
-        "camera": filmroll.camera,
-        "identifier": filmroll.archival_identifier
+        "id": roll_id,
+        "film": film_roll.film.to_dict(),
+        "pictures": [picture.db_id for picture in film_roll.pictures],
+        "filmroll_status": film_roll.status,
+        "camera": film_roll.camera,
+        "identifier": film_roll.archival_identifier
     })
 
 
 @app.get("/api/v1/pictures")
 async def list_pictures():
     try:
-        pictures = db.fetch_pictures()
+        pictures = db.pictures.fetch_all()
     except Exception as e:
         return JSONResponse(status_code=500, content={"success": False, "error": str(e)})
 
@@ -143,7 +144,7 @@ async def list_pictures():
 @app.get("/api/v1/pictures/{picture_id}")
 async def get_picture(picture_id: int):
     try:
-        picture = db.fetch_picture(picture_id)
+        picture = db.pictures.fetch(picture_id=picture_id)
     except Exception as e:
         return JSONResponse(status_code=500, content={"success": False, "error": str(e)})
     return JSONResponse(status_code=200, content={
@@ -166,7 +167,7 @@ async def get_picture(filename: str):
                         path=f'./pictures/{filename}')
 
 
-@app.post("/api/v1/films")
+@app.post("/api/v1/film_stocks")
 async def create_film(request: FilmsBaseModel):
     film = Film(name=request.name,
                 iso=request.iso,
@@ -176,7 +177,7 @@ async def create_film(request: FilmsBaseModel):
 
     # TODO)) ADD id and response id
     try:
-        db_id = db.add_film(film)
+        db_id = db.film_stocks.create(film=film)
     except Exception as e:
         return JSONResponse(status_code=500, content={
             "message": str(e)
@@ -192,15 +193,13 @@ async def upload_image_file(request: UploadFile):
     if request.content_type not in mime_file_extension.keys():
         tempfile_ext: str = mime_file_extension[request.content_type]
 
-        filename = f"{uuid.uuid4().hex}."
+        filename = f"{uuid.uuid4().hex}.{tempfile_ext}"
 
-        with open(f".temp/{filename}.{tempfile_ext}", "wb") as f:
+        with open(f"{config.temporary_files_folder}{filename}", "wb") as f:
             f.write(request.file.read())
 
-
-
         subprocess.run(
-            ["./scripts/img.sh", f".temp/{filename}", f"./pictures/{filename}"]
+            ["./scripts/img.sh", f"{config.temporary_files_folder}{filename}", f"./pictures/{filename.split('.')[0]}.jpg"],
         )
 
         os.remove(f".temp/{filename}")
@@ -223,7 +222,6 @@ async def upload_image_file(request: UploadFile):
 async def upload_picture(request):
     req_json = await request.json()
 
-
     # else:  # TODO)) ADD FILM FORMAT
 
     picture = Picture(thumbnail="",
@@ -235,7 +233,7 @@ async def upload_picture(request):
                       printed=req_json["printed"])
 
     try:
-        insert_id = db.add_picture(picture)
+        insert_id = db.pictures.create(picture=picture)
     except Exception as e:
         return JSONResponse(status_code=500, content={
             "success": False,
@@ -248,7 +246,7 @@ async def upload_picture(request):
     })
 
 
-@app.post("/api/v1/filmrolls")
+@app.post("/api/v1/film_rolls")
 async def add_filmroll(request: Request):
     req_json = await request.json()
 
@@ -262,7 +260,7 @@ async def add_filmroll(request: Request):
                         film=film)
 
     try:
-        id = db.add_filmroll(filmroll)
+        id = db.film_rolls.create(filmroll=filmroll)
     except Exception as e:
         return JSONResponse(status_code=500, content={
             "success": False,
@@ -274,23 +272,18 @@ async def add_filmroll(request: Request):
         "filmroll_id": id
     })
 
-@app.post("/api/v1/films/{id}")
+
+@app.post("/api/v1/film_stocks/{id}")
 async def update_film(request: Request, id: int):
     pass
 
-@app.delete("/api/v1/films/{id}")
-async def delete_film(id: int):
+
+@app.delete("/api/v1/film_stocks/{id}")
+async def delete_film(stock_id: int):
     try:
-        resp_json = db.fetch_film(id).to_dict()
-        pictures_to_delete, deleted_films = db.delete_film_stock(id)
-        for picture in pictures_to_delete:
-            os.remove(f"./pictures/{picture}")
+        resp_json = db.film_stocks.delete(film_stock_id=stock_id)
     except Exception as e:
         return JSONResponse(status_code=500, content={"success": False, "error": str(e)})
 
-    return JSONResponse(status_code=200, content={
-        "id": {id},
-        "success": True,
-        "deleted_images": {len(pictures_to_delete)},
-        "deleted_films": deleted_films
-    })
+    resp_json.update({"success": True})
+    return JSONResponse(status_code=200, content=resp_json)

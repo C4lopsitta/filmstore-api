@@ -4,7 +4,7 @@ An API to access an SQLite DB on a raspberry that manages my film rolls so i can
 ## Planned features
 - [ ] Option to skip image processing
 - [ ] Option to store original size images
-- [ ] Folder settings for storing original sized images and thumbnails
+- [x] Folder settings for storing original sized images and thumbnails
 - [ ] Negative processing settings
 - [ ] User authentication with multiple user accounts
 - [ ] Film stock grouping (to group multiple versions of the same stock, like a group for Kodak Portra that contains all the ISOs and formats)
