@@ -35,11 +35,11 @@ def fetch_all(filter_type: FilmType = None) -> list[Film]:
     for row in rows:
         print(row)
         film_stocks.append(Film(db_id=row[0],
-                          name=row[1],
-                          iso=row[2],
-                          format=FilmFormat(row[5]),
-                          development_info=row[3],
-                          type=FilmType(row[4])))
+                                name=row[1],
+                                iso=row[2],
+                                format=FilmFormat(row[5]),
+                                development_info=row[3],
+                                type=FilmType(row[4])))
 
     return film_stocks
 
@@ -48,6 +48,7 @@ def delete(film_stock_id: int,
            delete_rolls: bool = False,
            delete_pictures: bool = False):
     rows_rolls_to_update = Db.cursor.execute(f"SELECT * FROM filmrolls WHERE film='{film_stock_id}';")
+    delete_rolls_result: dict | None = None
 
     for row in rows_rolls_to_update:
         if delete_rolls:
@@ -61,25 +62,6 @@ def delete(film_stock_id: int,
 
     return {
         "rolls_affected": len(rows_rolls_to_update) if delete_rolls else 0,
-        "pictures_affected": delete_rolls_result["pictures_affected"] if delete_pictures else 0,
+        "pictures_affected": delete_rolls_result["pictures_affected"] if delete_pictures is not None else 0,
         "stock_deleted": stock_to_delete.to_dict()
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

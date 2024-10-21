@@ -41,5 +41,3 @@ def fetch(picture_id: int) -> Picture:
                    posted=True if picture[5] > 0 else False,
                    printed=True if picture[6] > 0 else False,
                    thumbnail=picture[7])
-
-

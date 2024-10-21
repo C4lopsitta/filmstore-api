@@ -3,7 +3,6 @@ import sqlite3
 from Entities import Film
 from Db import film_stocks, film_rolls, pictures
 
-
 connection = sqlite3.connect('./film_stockstore.sqlite')
 
 cursor = connection.cursor()
@@ -56,43 +55,43 @@ def seed():
     if len(rs) == 0:
         default_rolls = [
             Film.Film(name="No Film",
-                 iso=0,
-                 development_info="",
-                 type=Film.FilmType.UNDEFINED,
-                 format=Film.FilmFormat.UNDEFINED),
+                      iso=0,
+                      development_info="",
+                      type=Film.FilmType.UNDEFINED,
+                      format=Film.FilmFormat.UNDEFINED),
             Film.Film(name="Ilford HP5+",
-                 iso=400, development_info="",
-                 type=Film.FilmType.BLACK_WHITE_PAN,
-                 format=Film.FilmFormat.THIRTY_FIVE_MM),
+                      iso=400, development_info="",
+                      type=Film.FilmType.BLACK_WHITE_PAN,
+                      format=Film.FilmFormat.THIRTY_FIVE_MM),
             Film.Film(name="Ilford FP4+",
-                 iso=125,
-                 development_info="",
-                 type=Film.FilmType.BLACK_WHITE_PAN,
-                 format=Film.FilmFormat.THIRTY_FIVE_MM),
+                      iso=125,
+                      development_info="",
+                      type=Film.FilmType.BLACK_WHITE_PAN,
+                      format=Film.FilmFormat.THIRTY_FIVE_MM),
             Film.Film(name="Kodak Gold",
-                 iso=200,
-                 development_info="",
-                 type=Film.FilmType.COLOR,
-                 format=Film.FilmFormat.THIRTY_FIVE_MM),
+                      iso=200,
+                      development_info="",
+                      type=Film.FilmType.COLOR,
+                      format=Film.FilmFormat.THIRTY_FIVE_MM),
             Film.Film(name="Kodak Ultramax",
-                 iso=400, development_info="",
-                 type=Film.FilmType.COLOR,
-                 format=Film.FilmFormat.THIRTY_FIVE_MM),
+                      iso=400, development_info="",
+                      type=Film.FilmType.COLOR,
+                      format=Film.FilmFormat.THIRTY_FIVE_MM),
             Film.Film(name="Ilford SFX",
-                 iso=200,
-                 development_info="",
-                 type=Film.FilmType.INFRARED,
-                 format=Film.FilmFormat.THIRTY_FIVE_MM),
+                      iso=200,
+                      development_info="",
+                      type=Film.FilmType.INFRARED,
+                      format=Film.FilmFormat.THIRTY_FIVE_MM),
             Film.Film(name="Harman Phoenix",
-                 iso=200,
-                 development_info="",
-                 type=Film.FilmType.COLOR,
-                 format=Film.FilmFormat.THIRTY_FIVE_MM),
+                      iso=200,
+                      development_info="",
+                      type=Film.FilmType.COLOR,
+                      format=Film.FilmFormat.THIRTY_FIVE_MM),
             Film.Film(name="Fomapan 100",
-                 iso=100,
-                 development_info="",
-                 type=Film.FilmType.BLACK_WHITE_PAN,
-                 format=Film.FilmFormat.ONE_TWENTY)
+                      iso=100,
+                      development_info="",
+                      type=Film.FilmType.BLACK_WHITE_PAN,
+                      format=Film.FilmFormat.ONE_TWENTY)
         ]
         for film in default_rolls:
             film_stocks.create(film)
@@ -100,4 +99,3 @@ def seed():
 
 
 seed()
-

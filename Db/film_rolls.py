@@ -5,7 +5,7 @@ from Entities.Picture import Picture
 
 def create(filmroll: FilmRoll) -> int:
     Db.cursor.execute("INSERT INTO filmrolls VALUES(NULL, ?, ?, ?, ?)",
-                   (filmroll.film.db_id, filmroll.archival_identifier, filmroll.status.value, filmroll.camera))
+                      (filmroll.film.db_id, filmroll.archival_identifier, filmroll.status.value, filmroll.camera))
     Db.connection.commit()
 
     Db.cursor.execute("SELECT last_insert_rowid() as ID FROM filmrolls;")
@@ -32,7 +32,7 @@ def fetch(filmroll_id: int) -> FilmRoll:
                                 location=row[2],
                                 aperture=row[3],
                                 shutter_speed=row[4],
-                                posted= True if row[5] == 1 else False,
+                                posted=True if row[5] == 1 else False,
                                 printed=True if row[6] == 1 else False,
                                 thumbnail=row[7]))
 
@@ -97,7 +97,3 @@ def fetch_all(stock_filter: int) -> list[FilmRoll]:
                                   camera=row[4]))
 
     return filmrolls
-
-
-
-
