@@ -1,5 +1,4 @@
 import glob
-import json
 import os
 import subprocess
 import uuid
@@ -18,7 +17,7 @@ from definitions import mime_file_extension, raw_file_types
 
 app = FastAPI(title="FilmStore",
               description="""An API to manage Film rolls, stocks and the images you shot on them.""",
-              version="1.0.0",
+              version="1.1.0",
               license_info={
                   "name": "GNU GPLv3",
                   "url": "https://gnu.org/copyright/",

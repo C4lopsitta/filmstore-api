@@ -9,7 +9,7 @@
     "include_exif_in_image_metadata": true
   },
   "data": {
-    "database_file_name": "./filmstore.sqlite"
+    "database_file_name": "./film_store_db.sqlite"
   },
   "authentication": {
     "use_user_auth": false,
