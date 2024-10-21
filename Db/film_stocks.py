@@ -1,21 +1,20 @@
 import Db
 from Entities.Film import Film, FilmType, FilmFormat
-from Db import cursor, connection
 
 
 def create(film: Film) -> int:
-    cursor.execute(
+    Db.cursor.execute(
         f"INSERT INTO film_stocks VALUES(NULL, '{film.name}', {film.iso}, '{film.development_info}', {film.type.value}, {film.format.value});"
     )
-    connection.commit()
-    cursor.execute("SELECT last_insert_rowid() FROM films;")
-    return cursor.fetchone()[0]
+    Db.connection.commit()
+    Db.cursor.execute("SELECT last_insert_rowid() FROM film_stocks;")
+    return Db.cursor.fetchone()[0]
 
 
 def fetch(film_id: int) -> Film:
-    cursor.execute("SELECT * FROM films WHERE id=?;", (film_id,))
+    Db.cursor.execute("SELECT * FROM film_stocks WHERE id=?;", (film_id,))
 
-    row = cursor.fetchone()
+    row = Db.cursor.fetchone()
 
     return Film(db_id=row[0],
                 name=row[1],
@@ -27,28 +26,28 @@ def fetch(film_id: int) -> Film:
 
 def fetch_all(filter_type: FilmType = None) -> list[Film]:
     if filter_type is None:
-        rows = cursor.execute('SELECT * FROM film_stocks;')
+        rows = Db.cursor.execute('SELECT * FROM film_stocks;')
     else:
-        rows = cursor.execute(f'SELECT * FROM film_stocks WHERE {filter_type.value} = type;')
+        rows = Db.cursor.execute(f'SELECT * FROM film_stocks WHERE {filter_type.value} = type;')
 
-    films: list[Film] = []
+    film_stocks: list[Film] = []
 
     for row in rows:
         print(row)
-        films.append(Film(db_id=row[0],
+        film_stocks.append(Film(db_id=row[0],
                           name=row[1],
                           iso=row[2],
                           format=FilmFormat(row[5]),
                           development_info=row[3],
                           type=FilmType(row[4])))
 
-    return films
+    return film_stocks
 
 
 def delete(film_stock_id: int,
            delete_rolls: bool = False,
            delete_pictures: bool = False):
-    rows_rolls_to_update = cursor.execute(f"SELECT * FROM filmrolls WHERE film='{film_stock_id}';")
+    rows_rolls_to_update = Db.cursor.execute(f"SELECT * FROM filmrolls WHERE film='{film_stock_id}';")
 
     for row in rows_rolls_to_update:
         if delete_rolls:
@@ -58,7 +57,7 @@ def delete(film_stock_id: int,
 
     stock_to_delete = fetch(film_stock_id)
 
-    cursor.execute(f"DELETE FROM film_stocks WHERE film='{film_stock_id}';")
+    Db.cursor.execute(f"DELETE FROM film_stocks WHERE film='{film_stock_id}';")
 
     return {
         "rolls_affected": len(rows_rolls_to_update) if delete_rolls else 0,

@@ -1,20 +1,20 @@
+import Db
 from Entities.Picture import Picture
-from Db import cursor, connection
 
 
 def create(picture: Picture) -> int:
-    cursor.execute(
+    Db.cursor.execute(
         f"INSERT INTO pictures VALUES(NULL, '{picture.description}', '{picture.location}',"
         f" {picture.aperture}, '{picture.shutter_speed}', {1 if picture.posted else 0}, {1 if picture.printed else 0},"
         f"'{picture.thumbnail}');"
     )
-    connection.commit()
-    cursor.execute(f"SELECT last_insert_rowid() as ID FROM pictures;")
-    return cursor.fetchone()[0]
+    Db.connection.commit()
+    Db.cursor.execute(f"SELECT last_insert_rowid() as ID FROM pictures;")
+    return Db.cursor.fetchone()[0]
 
 
 def fetch_all() -> list[Picture]:
-    rs = cursor.execute('SELECT * FROM pictures;')
+    rs = Db.cursor.execute('SELECT * FROM pictures;')
 
     pictures: list[Picture] = []
     for row in rs:
@@ -31,8 +31,8 @@ def fetch_all() -> list[Picture]:
 
 
 def fetch(picture_id: int) -> Picture:
-    cursor.execute(f"SELECT * FROM pictures WHERE id=?;", (picture_id,))
-    picture = cursor.fetchone()
+    Db.cursor.execute(f"SELECT * FROM pictures WHERE id=?;", (picture_id,))
+    picture = Db.cursor.fetchone()
     return Picture(db_id=picture[0],
                    description=picture[1],
                    location=picture[2],
