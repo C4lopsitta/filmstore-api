@@ -1,13 +1,14 @@
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
+from starlette.requests import Request
 
 import Db
 from Entities import FilmStock, FilmStockVariant
 
-router = APIRouter()
+router = APIRouter(prefix="/api/v1/filmStocks")
 
 
-@router.get("/api/v1/filmStocks/{uid}")
+@router.get("/{uid}")
 def get_film_stock(uid: str):
     stock = Db.film_stocks.fetch(uid)
     if stock is None:
@@ -24,7 +25,7 @@ def get_film_stock(uid: str):
                         })
 
 
-@router.get("/api/v1/filmStocks/variant/{uid}")
+@router.get("/variant/{uid}")
 def get_film_stock_variant(uid: str):
     stock = Db.film_stocks.fetch_parent_by_variant(uid)
 
@@ -42,7 +43,7 @@ def get_film_stock_variant(uid: str):
                         })
 
 
-@router.get("/api/v1/filmStocks")
+@router.get("")
 def get_all_film_stocks():
     stocks = Db.film_stocks.fetch_all()
 
@@ -55,8 +56,8 @@ def get_all_film_stocks():
                         })
 
 
-@router.post("/api/v1/filmStocks")
-async def create_film_stock(request):
+@router.post("")
+async def create_film_stock(request: Request):
     # TODO)) Add auth check
     request_json = await request.json()
 
@@ -65,6 +66,7 @@ async def create_film_stock(request):
         for variant in request_json["variants"]:
             stock_variants.append(FilmStockVariant(**variant))
 
+        request_json.pop("variants", None)
         stock = FilmStock(**request_json, variants=stock_variants)
     except Exception as e:
         return JSONResponse(status_code=400,
@@ -89,8 +91,8 @@ async def create_film_stock(request):
                         })
 
 
-@router.put("/api/v1/filmStocks/{uid}")
-async def update_film_stock(request, uid: str):
+@router.put("/{uid}")
+async def update_film_stock(request: Request, uid: str):
     request_json = await request.json()
 
     try:
@@ -99,7 +101,9 @@ async def update_film_stock(request, uid: str):
         for variant in request_json["variants"]:
             stock_variants.append(FilmStockVariant(**variant))
 
-        stock = FilmStock(**request_json)
+        request_json.pop("variants", None)
+        request_json.update({"uid": uid})
+        stock = FilmStock(**request_json, variants=stock_variants)
     except Exception as e:
         return JSONResponse(status_code=400,
                             content={
@@ -123,10 +127,33 @@ async def update_film_stock(request, uid: str):
                         })
 
 
-@router.delete("/api/v1/filmStocks/{uid}")
+@router.delete("/{uid}")
 def delete_film_stock(uid: str):
     try:
         Db.film_stocks.delete(uid)
+    except KeyError as kerr:
+        return JSONResponse(status_code=400,
+                            content={
+                                "success": False,
+                                "error": f"Stock {uid} not found"
+                            })
+    except Exception as e:
+        return JSONResponse(status_code=500,
+                            content={
+                                "success": False,
+                                "error": str(e)
+                            })
+
+    return JSONResponse(status_code=200,
+                        content={
+                            "success": True
+                        })
+
+
+@router.delete("/{stock_uid}/{variant_uid}")
+def delete_film_stock_variant(stock_uid: str, variant_uid: str):
+    try:
+        Db.film_stocks.delete_variant(stock_uid=stock_uid, variant_uid=variant_uid)
     except KeyError as kerr:
         return JSONResponse(status_code=400,
                             content={

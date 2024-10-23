@@ -3,26 +3,26 @@ from fastapi import APIRouter
 router = APIRouter()
 
 
-@router.get("/api/v1/albums/{uid}")
+@router.get("/{uid}")
 def get_album(uid: str):
     pass
 
 
-@router.get("/api/v1/albums")
+@router.get("")
 def get_all_albums():
     pass
 
 
-@router.post("/api/v1/albums")
+@router.post("")
 def create_album(request):
     pass
 
 
-@router.put("/api/v1/albums/{uid}")
+@router.put("/{uid}")
 def update_album(request, uid: str):
     pass
 
 
-@router.delete("/api/v1/albums/{uid}")
+@router.delete("/{uid}")
 def delete_album(uid: str):
     pass

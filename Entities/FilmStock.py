@@ -45,6 +45,7 @@ class FilmStockVariant:
         return {
             "iso": self.iso,
             "format": self.format.value,
+            "uid": self.uid,
             "format_name": self.format.__str__(),
         }
 

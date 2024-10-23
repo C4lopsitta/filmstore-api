@@ -4,7 +4,8 @@ from Config.config import Config
 from Db import albums, cameras, film_rolls, film_stocks, pictures, projects, users
 
 config = Config(open(file="Config/config.json", mode="r"))
-connection = sqlite3.connect(config.database_file_name)
+# TODO)) Find solution for same thread
+connection = sqlite3.connect(config.database_file_name, check_same_thread=False)
 
 cursor = connection.cursor()
 
@@ -34,7 +35,7 @@ CREATE TABLE IF NOT EXISTS cameras(
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS filmStocks(
     uid VARCHAR(32) PRIMARY KEY,
-    name TEXT NOT NULL,
+    name TEXT NOT NULL UNIQUE,
     info TEXT,
     emulsionType INTEGER NOT NULL
 );

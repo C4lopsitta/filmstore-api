@@ -3,26 +3,26 @@ from fastapi import APIRouter
 router = APIRouter()
 
 
-@router.get("/api/v1/filmRolls/{uid}")
+@router.get("/{uid}")
 def get_film_roll(uid: str):
     pass
 
 
-@router.get("/api/v1/filmRolls")
+@router.get("")
 def get_all_film_rolls():
     pass
 
 
-@router.post("/api/v1/filmRolls")
+@router.post("")
 def create_film_roll(request):
     pass
 
 
-@router.put("/api/v1/filmRolls/{uid}")
+@router.put("/{uid}")
 def update_film_roll(request, uid: str):
     pass
 
 
-@router.delete("/api/v1/filmRolls/{uid}")
+@router.delete("/{uid}")
 def delete_film_roll(uid: str):
     pass
