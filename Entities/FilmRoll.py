@@ -25,6 +25,7 @@ class FilmRoll:
                  date_start_shooting: str,
                  date_end_shooting: str,
                  stock: FilmStock | str,
+                 development_status: DevelopmentStatus = DevelopmentStatus.UNUSED,
                  is_shared: bool = False,
                  pictures: list[Picture] | None = None,
                  camera: Camera | str | None = None,
@@ -47,6 +48,7 @@ class FilmRoll:
         self.date_end_shooting = date_end_shooting
         self.pictures = pictures
         self.is_shared = is_shared
+        self.development_status = development_status
 
     @classmethod
     def from_db(cls,
@@ -74,5 +76,7 @@ class FilmRoll:
             "date_start_shooting": self.date_start_shooting,
             "date_end_shooting": self.date_end_shooting,
             "is_shared": self.is_shared,
+            "development_status": self.development_status.value,
+            "development_status_name": self.development_status,
         }
 

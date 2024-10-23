@@ -20,8 +20,8 @@ class Camera():
     def __init__(self,
                  brand: str,
                  model: str,
-                 camera_type: CameraType,
-                 owner: User | None = None,
+                 type_: CameraType,
+                 owner: User | str | None = None,
                  uid: str | uuid.UUID | None = None):
         if uid is None:
             self.uid = uuid.uuid4().__str__()
@@ -30,15 +30,23 @@ class Camera():
 
         self.brand = brand
         self.model = model
-        self.camera_type = camera_type
+        self.type = type_
         self.owner = owner
+
+    @classmethod
+    def from_db(cls, row: tuple):
+        return cls(uid=row[0],
+                   owner=row[1],
+                   brand=row[2],
+                   model=row[3],
+                   type_=CameraType(row[4]))
 
     def to_dict(self) -> dict:
         return {
             "uid": self.uid,
             "brand": self.brand,
             "model": self.model,
-            "camera_type": self.camera_type.value,
-            "camera_type_name": self.camera_type,
-            "owner": self.owner.uid
+            "camera_type": self.type.value,
+            "camera_type_name": self.type,
+            "owner_uid": self.owner.uid if type(self.owner) is User else self.owner,
         }

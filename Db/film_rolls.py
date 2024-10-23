@@ -1,6 +1,6 @@
 import Db
 from Entities.FilmRoll import FilmRoll, DevelopmentStatus
-from Entities.Picture import Picture
+from Entities.FilmStock import FilmStockVariant
 
 
 def create(film_roll: FilmRoll):
@@ -12,11 +12,11 @@ def create(film_roll: FilmRoll):
                                      '{film_roll.archival_id}',
                                      '{film_roll.date_start_shooting}',
                                      '{film_roll.date_end_shooting}',
-                                     '{film_roll.stock.uid}',
-                                     '{film_roll.camera.uid}',
-                                     '{film_roll.project.uid}',
-                                     '{film_roll.album.uid}',
-                                     '{film_roll.owner.uid}',
+                                     '{film_roll.stock.uid if type(film_roll.stock) is not str else film_roll.stock}',
+                                     '{film_roll.camera.uid if type(film_roll.camera) is not str else film_roll.camera}',
+                                     '{film_roll.project.uid if type(film_roll.project) is not str else film_roll.project}',
+                                     '{film_roll.album.uid if type(film_roll.album) is not str else film_roll.album}',
+                                     '{film_roll.owner.uid if type(film_roll.owner) is not str else film_roll.owner}',
                                      {film_roll.is_shared})
     """)
 
@@ -32,10 +32,14 @@ def fetch(uid: str) -> FilmRoll | None:
     return FilmRoll.from_db(row=row)
 
 
-def fetch_all() -> list[FilmRoll] | None:
+def fetch_all(stock_filter: FilmStockVariant | str | None = None) -> list[FilmRoll] | None:
     rolls: list[FilmRoll] = []
 
-    rows = Db.cursor.execute("SELECT * FROM filmRolls;").fetchall()
+    if stock_filter is None:
+        rows = Db.cursor.execute("SELECT * FROM filmRolls;").fetchall()
+    else:
+        stock_filter = stock_filter.__str__() if type(stock_filter) is str else stock_filter
+        rows = Db.cursor.execute(f"SELECT * FROM filmRolls WHERE stock = '{stock_filter}';").fetchall()
 
     if len(rows) == 0 or rows[0] is None:
         return None
@@ -52,10 +56,10 @@ def update(film_roll: FilmRoll):
 
     Db.cursor.execute(f"""
         UPDATE filmRolls WHERE uid='{film_roll.uid}' SET archival_id='{film_roll.archival_id}',
-                                                         stock='{film_roll.stock.uid}',
-                                                         camera='{film_roll.camera.uid}',
-                                                         project='{film_roll.project.uid}',
-                                                         album='{film_roll.album.uid}',
+                                                         stock='{film_roll.stock.uid if type(film_roll.stock) is not str else film_roll.stock}',
+                                                         camera='{film_roll.camera.uid if type(film_roll.camera) is not str else film_roll.camera}',
+                                                         project='{film_roll.project.uid if type(film_roll.project) is not str else film_roll.project}',
+                                                         album='{film_roll.album.uid if type(film_roll.album) is not str else film_roll.album}',
                                                          isShared='{film_roll.is_shared}'
                                                          startShooting='{film_roll.date_start_shooting}',
                                                          endShooting='{film_roll.date_end_shooting}';
