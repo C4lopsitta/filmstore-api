@@ -1,12 +1,11 @@
 import uuid
-
-from Entities.User import User
+import Entities
 
 
 class Project():
     def __init__(self,
                  name: str,
-                 owner: User | str | None = None,
+                 owner: Entities.User | str | None = None,
                  description: str | None = None,
                  location: str | None = None,
                  is_shared: bool = False,
@@ -37,7 +36,7 @@ class Project():
         return {
             "uid": self.uid,
             "name": self.name,
-            "owner_uid": self.owner.uid if type(self.owner) is User else self.owner,
+            "owner_uid": self.owner.uid if type(self.owner) is Entities.User else self.owner,
             "description": self.description,
             "location": self.location,
             "is_shared": self.is_shared,

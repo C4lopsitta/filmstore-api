@@ -1,9 +1,5 @@
 import uuid
-
-from Entities.Album import Album
-from Entities.FilmRoll import FilmRoll
-from Entities.Project import Project
-from Entities.User import User
+import Entities
 
 
 class Picture:
@@ -16,10 +12,10 @@ class Picture:
                  aperture: str | None = None,
                  shutter_speed: str | None = None,
                  flickr_post_url: str | None = None,
-                 owner: User | str | None = None,
-                 film_roll: FilmRoll | str | None = None,
-                 album: Album | str | None = None,
-                 project: Project | str | None = None,
+                 owner: Entities.User | str | None = None,
+                 film_roll: Entities.FilmRoll | str | None = None,
+                 album: Entities.Album | str | None = None,
+                 project: Entities.Project | str | None = None,
                  uid: str | uuid.UUID | None = None):
         if uid is None:
             self.uid = uuid.uuid4().__str__()
@@ -66,8 +62,8 @@ class Picture:
             "aperture": self.aperture,
             "shutter_speed": self.shutter_speed,
             "flickr_post_url": self.flickr_post_url,
-            "owner_uid": self.owner.uid if type(self.owner) is User else self.owner,
-            "film_roll_uid": self.film_roll.uid if type(self.film_roll) is FilmRoll else self.film_roll,
-            "album_uid": self.album.uid if type(self.album) is Album else self.album,
-            "project_uid": self.project.uid if type(self.project) is Project else self.project,
+            "owner_uid": self.owner.uid if type(self.owner) is Entities.User else self.owner,
+            "film_roll_uid": self.film_roll.uid if type(self.film_roll) is Entities.FilmRoll else self.film_roll,
+            "album_uid": self.album.uid if type(self.album) is Entities.Album else self.album,
+            "project_uid": self.project.uid if type(self.project) is Entities.Project else self.project,
         }

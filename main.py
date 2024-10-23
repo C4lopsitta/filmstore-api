@@ -9,10 +9,8 @@ from starlette.responses import HTMLResponse
 
 import Db
 from BaseModels.Films import FilmsBaseModel
-from Entities.FilmStock import FilmStock, FilmEmulsionType, FilmFormat
-from Entities.FilmRoll import FilmRoll, DevelopmentStatus
-from Entities.Picture import Picture
 from Config.config import Config
+from Entities import FilmRoll, FilmStock, FilmEmulsionType, FilmFormat, DevelopmentStatus, Picture
 from definitions import mime_file_extension, raw_file_types
 
 app = FastAPI(title="FilmStore",
@@ -22,6 +20,7 @@ app = FastAPI(title="FilmStore",
                   "name": "GNU GPLv3",
                   "url": "https://gnu.org/copyright/",
               })
+
 config = Config(open(file="Config/config.json", mode="r"))
 
 

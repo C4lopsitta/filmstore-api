@@ -1,7 +1,6 @@
 import uuid
 from enum import Enum
-
-from Entities.User import User
+import Entities
 
 
 class CameraType(Enum):
@@ -21,7 +20,7 @@ class Camera():
                  brand: str,
                  model: str,
                  type_: CameraType,
-                 owner: User | str | None = None,
+                 owner: Entities.User | str | None = None,
                  uid: str | uuid.UUID | None = None):
         if uid is None:
             self.uid = uuid.uuid4().__str__()
@@ -48,5 +47,5 @@ class Camera():
             "model": self.model,
             "camera_type": self.type.value,
             "camera_type_name": self.type,
-            "owner_uid": self.owner.uid if type(self.owner) is User else self.owner,
+            "owner_uid": self.owner.uid if type(self.owner) is Entities.User else self.owner,
         }

@@ -12,7 +12,7 @@ def create(film_roll: FilmRoll):
                                      '{film_roll.archival_id}',
                                      '{film_roll.date_start_shooting}',
                                      '{film_roll.date_end_shooting}',
-                                     '{film_roll.stock.uid if type(film_roll.stock) is not str else film_roll.stock}',
+                                     '{film_roll.stock_variant.uid if type(film_roll.stock_variant) is not str else film_roll.stock_variant}',
                                      '{film_roll.camera.uid if type(film_roll.camera) is not str else film_roll.camera}',
                                      '{film_roll.project.uid if type(film_roll.project) is not str else film_roll.project}',
                                      '{film_roll.album.uid if type(film_roll.album) is not str else film_roll.album}',
@@ -56,7 +56,7 @@ def update(film_roll: FilmRoll):
 
     Db.cursor.execute(f"""
         UPDATE filmRolls WHERE uid='{film_roll.uid}' SET archival_id='{film_roll.archival_id}',
-                                                         stock='{film_roll.stock.uid if type(film_roll.stock) is not str else film_roll.stock}',
+                                                         stock='{film_roll.stock_variant.uid if type(film_roll.stock_variant) is not str else film_roll.stock_variant}',
                                                          camera='{film_roll.camera.uid if type(film_roll.camera) is not str else film_roll.camera}',
                                                          project='{film_roll.project.uid if type(film_roll.project) is not str else film_roll.project}',
                                                          album='{film_roll.album.uid if type(film_roll.album) is not str else film_roll.album}',

@@ -1,13 +1,13 @@
 import uuid
 
-from Entities.User import User
+import Entities
 
 
 class Album():
     def __init__(self,
                  name: str,
                  is_shared: bool = False,
-                 owner: User | str | None = None,
+                 owner: Entities.User | str | None = None,
                  description: str | None = None,
                  uid: str | uuid.UUID | None = None):
         if uid is None:
@@ -33,6 +33,6 @@ class Album():
             "uid": self.uid,
             "name": self.name,
             "is_shared": self.is_shared,
-            "owner_uid": self.owner.uid if type(self.owner) is User else self.owner,
+            "owner_uid": self.owner.uid if type(self.owner) is Entities.User else self.owner,
             "description": self.description
         }

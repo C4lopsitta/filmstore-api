@@ -1,9 +1,7 @@
 import sqlite3
-import uuid
 
 from Config.config import Config
-from Entities import FilmStock
-from Db import film_stocks, film_rolls, pictures
+from Db import albums, cameras, film_rolls, film_stocks, pictures, projects, users
 
 config = Config(open(file="Config/config.json", mode="r"))
 connection = sqlite3.connect(config.database_file_name)
@@ -119,58 +117,57 @@ CREATE TABLE IF NOT EXISTS pictures(
 """)
 # endregion init
 
-
-def seed():
-    rs = cursor.execute("SELECT * FROM filmStocks;").fetchall()
-    if len(rs) == 0:
-        default_rolls = [
-            Film.FilmStock(name="No Film",
-                           iso=0,
-                           development_info="",
-                           type=Film.FilmEmulsionType.UNDEFINED,
-                           format=Film.FilmFormat.UNDEFINED),
-            Film.FilmStock(name="Ilford HP5+",
-                           iso=400, development_info="",
-                           type=Film.FilmEmulsionType.BLACK_WHITE_PAN,
-                           format=Film.FilmFormat.THIRTY_FIVE_MM),
-            Film.FilmStock(name="Ilford FP4+",
-                           iso=125,
-                           development_info="",
-                           type=Film.FilmEmulsionType.BLACK_WHITE_PAN,
-                           format=Film.FilmFormat.THIRTY_FIVE_MM),
-            Film.FilmStock(name="Kodak Gold",
-                           iso=200,
-                           development_info="",
-                           type=Film.FilmEmulsionType.COLOR,
-                           format=Film.FilmFormat.THIRTY_FIVE_MM),
-            Film.FilmStock(name="Kodak Ultramax",
-                           iso=400, development_info="",
-                           type=Film.FilmEmulsionType.COLOR,
-                           format=Film.FilmFormat.THIRTY_FIVE_MM),
-            Film.FilmStock(name="Ilford SFX",
-                           iso=200,
-                           development_info="",
-                           type=Film.FilmEmulsionType.INFRARED,
-                           format=Film.FilmFormat.THIRTY_FIVE_MM),
-            Film.FilmStock(name="Harman Phoenix",
-                           iso=200,
-                           development_info="",
-                           type=Film.FilmEmulsionType.COLOR,
-                           format=Film.FilmFormat.THIRTY_FIVE_MM),
-            Film.FilmStock(name="Fomapan 100",
-                           iso=100,
-                           development_info="",
-                           type=Film.FilmEmulsionType.BLACK_WHITE_PAN,
-                           format=Film.FilmFormat.ONE_TWENTY)
-        ]
-        for film in default_rolls:
-            film_stocks.create(film)
-        connection.commit()
-
-    rs = connection.execute("SELECT * FROM users;").fetchall()
-    if len(rs) == 0:
-        connection.execute(f"INSERT INTO users VALUES({uuid.uuid4().__str__()},"
-                           f"'DEFAULT', '')")
-
-
+#
+# def seed():
+#     rs = cursor.execute("SELECT * FROM filmStocks;").fetchall()
+#     if len(rs) == 0:
+#         default_rolls = [
+#             Film.FilmStock(name="No Film",
+#                            iso=0,
+#                            development_info="",
+#                            type=Film.FilmEmulsionType.UNDEFINED,
+#                            format=Film.FilmFormat.UNDEFINED),
+#             Film.FilmStock(name="Ilford HP5+",
+#                            iso=400, development_info="",
+#                            type=Film.FilmEmulsionType.BLACK_WHITE_PAN,
+#                            format=Film.FilmFormat.THIRTY_FIVE_MM),
+#             Film.FilmStock(name="Ilford FP4+",
+#                            iso=125,
+#                            development_info="",
+#                            type=Film.FilmEmulsionType.BLACK_WHITE_PAN,
+#                            format=Film.FilmFormat.THIRTY_FIVE_MM),
+#             Film.FilmStock(name="Kodak Gold",
+#                            iso=200,
+#                            development_info="",
+#                            type=Film.FilmEmulsionType.COLOR,
+#                            format=Film.FilmFormat.THIRTY_FIVE_MM),
+#             Film.FilmStock(name="Kodak Ultramax",
+#                            iso=400, development_info="",
+#                            type=Film.FilmEmulsionType.COLOR,
+#                            format=Film.FilmFormat.THIRTY_FIVE_MM),
+#             Film.FilmStock(name="Ilford SFX",
+#                            iso=200,
+#                            development_info="",
+#                            type=Film.FilmEmulsionType.INFRARED,
+#                            format=Film.FilmFormat.THIRTY_FIVE_MM),
+#             Film.FilmStock(name="Harman Phoenix",
+#                            iso=200,
+#                            development_info="",
+#                            type=Film.FilmEmulsionType.COLOR,
+#                            format=Film.FilmFormat.THIRTY_FIVE_MM),
+#             Film.FilmStock(name="Fomapan 100",
+#                            iso=100,
+#                            development_info="",
+#                            type=Film.FilmEmulsionType.BLACK_WHITE_PAN,
+#                            format=Film.FilmFormat.ONE_TWENTY)
+#         ]
+#         for film in default_rolls:
+#             film_stocks.create(film)
+#         connection.commit()
+#
+#     rs = connection.execute("SELECT * FROM users;").fetchall()
+#     if len(rs) == 0:
+#         connection.execute(f"INSERT INTO users VALUES({uuid.uuid4().__str__()},"
+#                            f"'DEFAULT', '')")
+#
 # seed()

@@ -1,12 +1,7 @@
 import uuid
 from enum import Enum
 
-from Entities.Album import Album
-from Entities.Camera import Camera
-from Entities.Picture import Picture
-from Entities.FilmStock import FilmStock
-from Entities.Project import Project
-from Entities.User import User
+import Entities
 
 
 class DevelopmentStatus(Enum):
@@ -24,14 +19,13 @@ class FilmRoll:
                  archival_id: str,
                  date_start_shooting: str,
                  date_end_shooting: str,
-                 stock: FilmStock | str,
+                 stock: Entities.FilmStockVariant | str,
                  development_status: DevelopmentStatus = DevelopmentStatus.UNUSED,
                  is_shared: bool = False,
-                 pictures: list[Picture] | None = None,
-                 camera: Camera | str | None = None,
-                 project: Project | str | None = None,
-                 album: Album | str | None = None,
-                 owner: User | str | None = None,
+                 camera: Entities.Camera | str | None = None,
+                 project: Entities.Project | str | None = None,
+                 album: Entities.Album | str | None = None,
+                 owner: Entities.User | str | None = None,
                  uid: str | uuid.UUID | None = None):
         if uid is None:
             self.uid = uuid.uuid4().__str__()
@@ -39,14 +33,13 @@ class FilmRoll:
             self.uid = uid.__str__() if type(uid) is uuid.UUID else uuid.UUID(uid).__str__()
 
         self.archival_id = archival_id
-        self.stock = stock
+        self.stock_variant = stock
         self.camera = camera
         self.project = project
         self.album = album
         self.owner = owner
         self.date_start_shooting = date_start_shooting
         self.date_end_shooting = date_end_shooting
-        self.pictures = pictures
         self.is_shared = is_shared
         self.development_status = development_status
 
@@ -68,7 +61,7 @@ class FilmRoll:
         return {
             "uid": self.uid,
             "archival_id": self.archival_id,
-            "stock_uid": self.stock.uid if type(self.stock.uid) is not str else self.stock,
+            "stock_variant_uid": self.stock_variant.uid if type(self.stock_variant.uid) is not str else self.stock_variant,
             "camera_uid": self.camera.uid if type(self.camera.uid) is not str else self.camera,
             "project_uid": self.project.uid if type(self.project.uid) is not str else self.project,
             "album_uid": self.album.uid if type(self.album.uid) is not str else self.album,
