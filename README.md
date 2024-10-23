@@ -6,19 +6,32 @@ An API to access an SQLite DB on a raspberry that manages my film rolls so i can
 - [x] Option to store original size images
 - [x] Folder settings for storing original sized images and thumbnails
 - [ ] Negative processing settings
-- [ ] User authentication with multiple user accounts
+- [X] User authentication with multiple user accounts
+> [!Note]
+> While technically supported by the DB, right now no authentication is enforced as the API is broken and needs to be 
+> updated to use the new DB functions.
 - [ ] Film stock grouping (to group multiple versions of the same stock, like a group for Kodak Portra that contains all the ISOs and formats)
-- [ ] Projects to group images or rolls
-- [ ] Non-film images to allow for general image backups
-- [ ] Image albums
-- [ ] Docker container
+- [X] Projects to group images or rolls
+- [X] Non-film images to allow for general image backups
+- [X] Image albums
+- [X] Docker container
 
 > [!Note]
 > Currently the API endpoints have changed *quite a bit* so the app is broken. Right now the API is my priority and I'll 
 > get back to the App as soon as the API has reached a good state.
 
+> [!Note]
+> The database schema has been completely redone [as shown in the diagram here](Db/README.md) and the old one was not 
+> migrated. Data will be lost, no intentions on making a migration as the schema has changed a lot and i kinda figured 
+> no one else but me will care.
+
 ## Running the API
-A running script, which expects to have a python VENV available in the `venv` folder, is available.
+You can run the Docker container by simply building and launching the included `Dockerfile`:.
+```bash
+docker build . -t "filmstore"
+docker run -d "filmstore"
+```
+A running script, which expects to have a python VENV available in the `venv` folder, is also available.
 You can run in with:
 ```bash
 ./filmstore.sh
