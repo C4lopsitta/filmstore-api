@@ -1,6 +1,6 @@
 from enum import Enum
 from Entities.Picture import Picture
-from Entities.Film import Film
+from Entities.FilmStock import FilmStock
 
 
 class DevelopmentStatus(Enum):
@@ -15,7 +15,7 @@ class DevelopmentStatus(Enum):
 class FilmRoll:
     def __init__(self,
                  camera: str,
-                 film: Film,
+                 film: FilmStock,
                  archival_identifier: str,
                  pictures: list[Picture],
                  db_id: int = None,

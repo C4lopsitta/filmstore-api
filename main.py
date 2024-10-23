@@ -9,7 +9,7 @@ from starlette.responses import HTMLResponse
 
 import Db
 from BaseModels.Films import FilmsBaseModel
-from Entities.Film import Film, FilmType, FilmFormat
+from Entities.FilmStock import FilmStock, FilmEmulsionType, FilmFormat
 from Entities.FilmRoll import FilmRoll, DevelopmentStatus
 from Entities.Picture import Picture
 from Config.config import Config
@@ -203,11 +203,11 @@ async def get_picture(filename: str):
 
 @app.post("/api/v1/film_stocks")
 async def create_film(request: FilmsBaseModel):
-    film = Film(name=request.name,
-                iso=request.iso,
-                development_info=request.development_info,
-                type=FilmType(request.type),
-                format=FilmFormat(request.format), )
+    film = FilmStock(name=request.name,
+                     iso=request.iso,
+                     development_info=request.development_info,
+                     type=FilmEmulsionType(request.type),
+                     format=FilmFormat(request.format), )
 
     # TODO)) ADD id and response id
     try:
@@ -314,7 +314,7 @@ async def add_film_roll(request: Request):
     req_json = await request.json()
 
     pictures = [Picture(thumbnail="", db_id=id) for id in req_json["pictures"]]
-    film = Film(db_id=req_json["film"], name="", iso=0, development_info="", type=FilmType.UNDEFINED)
+    film = FilmStock(db_id=req_json["film"], name="", iso=0, development_info="", type=FilmEmulsionType.UNDEFINED)
 
     filmroll = FilmRoll(camera=req_json["camera"],
                         archival_identifier=req_json["identifier"],

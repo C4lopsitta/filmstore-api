@@ -1,67 +1,109 @@
+import uuid
+
 import Db
-from Entities.Film import Film, FilmType, FilmFormat
+from Entities.FilmStock import FilmStock, FilmStockVariant
 
 
-def create(film: Film) -> int:
-    Db.cursor.execute(
-        f"INSERT INTO film_stocks VALUES(NULL, '{film.name}', {film.iso}, '{film.development_info}', {film.type.value}, {film.format.value});"
-    )
+def create(film_stock: FilmStock):
+    # Check existence of base stock
+    if _db_load_stock(uid=film_stock.uid) is None:
+        # Not there, create it
+        Db.cursor.execute(f"""
+            INSERT INTO filmStocks VALUES('{film_stock.uid}',
+                                          '{film_stock.name}',
+                                          '{film_stock.info}',
+                                          {film_stock.emulsion_type.value});
+        """)
+
+        Db.connection.cursor()
+
+    # Create all variants, if it doesn't exist
+    for variant in film_stock.variants:
+        if Db.cursor.execute(
+                f"SELECT * FROM filmStockVariants WHERE stock = '{film_stock.uid}' AND uid = '{variant.uid}';").fetchall() is None:
+            Db.cursor.execute(f"""
+                INSERT INTO filmStockVariants VALUES('{variant.uid}',
+                                                     '{film_stock.uid}',
+                                                     {variant.iso},
+                                                     {variant.format.value});
+            """)
+
     Db.connection.commit()
-    Db.cursor.execute("SELECT last_insert_rowid() FROM film_stocks;")
-    return Db.cursor.fetchone()[0]
 
 
-def fetch(film_id: int) -> Film:
-    Db.cursor.execute("SELECT * FROM film_stocks WHERE id=?;", (film_id,))
+def fetch(uid: str | uuid.UUID) -> FilmStock | None:
+    # Check if it exists, if it's there, load it and then load the variants
+    row = _db_load_stock(uid=uid)
 
-    row = Db.cursor.fetchone()
+    if row is None:
+        return None
 
-    return Film(db_id=row[0],
-                name=row[1],
-                iso=row[2],
-                development_info=row[3],
-                type=FilmType(row[4]),
-                format=FilmFormat(row[5]))
+    stock_variants = _load_variants(uid=uid)
+    stock = FilmStock.from_db(row=row,
+                              variants=stock_variants)
+
+    return stock
 
 
-def fetch_all(filter_type: FilmType = None) -> list[Film]:
-    if filter_type is None:
-        rows = Db.cursor.execute('SELECT * FROM film_stocks;')
-    else:
-        rows = Db.cursor.execute(f'SELECT * FROM film_stocks WHERE {filter_type.value} = type;')
+def fetch_all() -> list[FilmStock] | None:
+    stocks: list[FilmStock] = []
 
-    film_stocks: list[Film] = []
+    rows = Db.cursor.execute("SELECT * FROM filmStocks;").fetchall()
+
+    if len(rows) == 0 or rows[0] is None:
+        return None
 
     for row in rows:
-        print(row)
-        film_stocks.append(Film(db_id=row[0],
-                                name=row[1],
-                                iso=row[2],
-                                format=FilmFormat(row[5]),
-                                development_info=row[3],
-                                type=FilmType(row[4])))
+        variants = _load_variants(uid=row[0])
+        stocks.append(FilmStock.from_db(row=row, variants=variants))
 
-    return film_stocks
+    return stocks
 
 
-def delete(film_stock_id: int,
-           delete_rolls: bool = False,
-           delete_pictures: bool = False):
-    rows_rolls_to_update = Db.cursor.execute(f"SELECT * FROM filmrolls WHERE film='{film_stock_id}';")
-    delete_rolls_result: dict | None = None
+def update(stock: FilmStock) -> None:
+    if _db_load_stock(uid=stock.uid) is None:
+        raise KeyError(f"Stock {stock.uid} does not exist. Create it first.")
 
-    for row in rows_rolls_to_update:
-        if delete_rolls:
-            delete_rolls_result: dict = Db.film_rolls.delete(row[0], delete_pictures)
-        else:
-            Db.film_rolls.update(row[0], )  # TODO))
+    for variant in stock.variants:
+        _update_variant(stock_uid=stock.uid,
+                        variant=variant)
 
-    stock_to_delete = fetch(film_stock_id)
+    Db.cursor.execute(f"""
+        UPDATE filmStocks WHERE uid = '{stock.uid}' SET name = '{stock.name}', info = '{stock.info}', emulsion_type = '{stock.emulsion_type}';
+    """)
 
-    Db.cursor.execute(f"DELETE FROM film_stocks WHERE film='{film_stock_id}';")
 
-    return {
-        "rolls_affected": len(rows_rolls_to_update) if delete_rolls else 0,
-        "pictures_affected": delete_rolls_result["pictures_affected"] if delete_pictures is not None else 0,
-        "stock_deleted": stock_to_delete.to_dict()
-    }
+def delete(uid: str):
+    if _db_load_stock(uid=uid) is None:
+        KeyError(f"Stock {uid} does not exist. Create it first.")
+
+    Db.cursor.execute(f"""
+        DELETE FROM filmStocks WHERE uid = '{uid}';
+    """)
+
+
+def _db_load_stock(uid: str) -> tuple:
+    return Db.cursor.execute(f"SELECT * FROM filmStocks WHERE uid = '{uid}';").fetchall()
+
+
+def _load_variants(uid: str) -> list[FilmStockVariant]:
+    stock_variants: list[FilmStockVariant] = []
+
+    # Get all variants
+    for variant_row in Db.cursor.execute(f"SELECT * FROM filmStockVariants WHERE stock = '{uid}';"):
+        stock_variants.append(FilmStockVariant.from_db(row=variant_row))
+
+    return stock_variants
+
+
+def _update_variant(stock_uid: str,
+                    variant: FilmStockVariant):
+    row = Db.cursor.execute(
+        f"SELECT * FROM filmStockVariants WHERE stock = '{stock_uid}' AND uid = '{variant.uid}';").fetchall()
+
+    if row is None:
+        raise KeyError(f"Stock variant {variant.uid} of stock {stock_uid} does not exist. Create it first.")
+
+    Db.cursor.execute(f"""
+        UPDATE filmStockVariants WHERE stock = '{stock_uid}' AND uid = '{variant.uid}' SET iso = {variant.iso}, format = {variant.format.value};
+    """)
