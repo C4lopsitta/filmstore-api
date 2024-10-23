@@ -22,7 +22,7 @@ app = FastAPI(title="FilmStore",
 
 config = Config(open(file="Config/config.json", mode="r"))
 
-app.include_router(Routers.film_stocks_router, prefix="/api/v1/filmStocks")
+app.include_router(Routers.film_stocks_router)
 app.include_router(Routers.film_rolls_router, prefix="/api/v1/filmRolls")
 app.include_router(Routers.pictures_router, prefix="/api/v1/pictures")
 app.include_router(Routers.albums_router, prefix="/api/v1/albums")

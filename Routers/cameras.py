@@ -3,26 +3,26 @@ from fastapi import APIRouter
 router = APIRouter()
 
 
-@router.get("/api/v1/cameras/{uid}")
+@router.get("/{uid}")
 def get_camera(uid: str):
     pass
 
 
-@router.get("/api/v1/cameras")
+@router.get("")
 def get_all_cameras():
     pass
 
 
-@router.post("/api/v1/cameras")
+@router.post("")
 def create_camera(request):
     pass
 
 
-@router.put("/api/v1/cameras/{uid}")
+@router.put("/{uid}")
 def update_camera(request, uid: str):
     pass
 
 
-@router.delete("/api/v1/cameras/{uid}")
+@router.delete("/{uid}")
 def delete_camera(uid: str):
     pass

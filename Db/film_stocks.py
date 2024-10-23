@@ -14,27 +14,19 @@ def create(film_stock: FilmStock):
                                           '{film_stock.info}',
                                           {film_stock.emulsion_type.value});
         """)
-
-        Db.connection.cursor()
+        Db.connection.commit()
 
     # Create all variants, if it doesn't exist
     for variant in film_stock.variants:
         if Db.cursor.execute(
-                f"SELECT * FROM filmStockVariants WHERE stock = '{film_stock.uid}' AND uid = '{variant.uid}';").fetchall() is None:
-            Db.cursor.execute(f"""
-                INSERT INTO filmStockVariants VALUES('{variant.uid}',
-                                                     '{film_stock.uid}',
-                                                     {variant.iso},
-                                                     {variant.format.value});
-            """)
-
-    Db.connection.commit()
+                f"SELECT * FROM filmStockVariants WHERE stock = '{film_stock.uid}' AND uid = '{variant.uid}';").fetchone() is None:
+            _create_variant(variant=variant, stock_uid=film_stock.uid)
 
 
 def fetch_parent_by_variant(uid: str) -> FilmStock | None:
     row = Db.cursor.execute(f"""
         SELECT * FROM filmStockVariants WHERE uid = '{uid}';
-    """)
+    """).fetchone()
 
     if row is None:
         return None
@@ -79,9 +71,9 @@ def update(stock: FilmStock) -> None:
         _update_variant(stock_uid=stock.uid,
                         variant=variant)
 
-    Db.cursor.execute(f"""
-        UPDATE filmStocks WHERE uid = '{stock.uid}' SET name = '{stock.name}', info = '{stock.info}', emulsion_type = '{stock.emulsion_type}';
-    """)
+    Db.cursor.execute(f"""UPDATE filmStocks
+                          SET name = '{stock.name}', info = '{stock.info}', emulsionType = '{stock.emulsion_type.value}'
+                          WHERE uid = '{stock.uid}';""")
 
     Db.connection.commit()
 
@@ -92,6 +84,18 @@ def delete(uid: str):
 
     Db.cursor.execute(f"""
         DELETE FROM filmStocks WHERE uid = '{uid}';
+    """)
+
+    Db.connection.commit()
+
+
+def delete_variant(stock_uid: str,
+                   variant_uid: str):
+    if _db_load_stock(uid=stock_uid) is None:
+        KeyError(f"Stock {stock_uid} does not exist. Create it first.")
+
+    Db.cursor.execute(f"""
+        DELETE FROM filmStockVariants WHERE uid = '{variant_uid}' AND stock = '{stock_uid}';
     """)
 
     Db.connection.commit()
@@ -114,11 +118,22 @@ def _load_variants(uid: str) -> list[FilmStockVariant]:
 def _update_variant(stock_uid: str,
                     variant: FilmStockVariant):
     row = Db.cursor.execute(
-        f"SELECT * FROM filmStockVariants WHERE stock = '{stock_uid}' AND uid = '{variant.uid}';").fetchall()
+        f"SELECT * FROM filmStockVariants WHERE stock = '{stock_uid}' AND uid = '{variant.uid}';").fetchone()
 
     if row is None:
-        raise KeyError(f"Stock variant {variant.uid} of stock {stock_uid} does not exist. Create it first.")
+        _create_variant(variant=variant, stock_uid=stock_uid)
+    else:
+        Db.cursor.execute(f"""UPDATE filmStockVariants
+                              SET iso = {variant.iso}, format = {variant.format.value}
+                              WHERE stock = '{stock_uid}'
+                              AND uid = '{variant.uid}';""")
 
+
+def _create_variant(variant: FilmStockVariant, stock_uid: str):
     Db.cursor.execute(f"""
-        UPDATE filmStockVariants WHERE stock = '{stock_uid}' AND uid = '{variant.uid}' SET iso = {variant.iso}, format = {variant.format.value};
-    """)
+                    INSERT INTO filmStockVariants VALUES('{variant.uid}',
+                                                         '{stock_uid}',
+                                                         {variant.iso},
+                                                         {variant.format.value});
+                """)
+    Db.connection.commit()
