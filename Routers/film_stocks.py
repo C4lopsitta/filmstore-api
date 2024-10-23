@@ -52,7 +52,7 @@ def get_all_film_stocks():
     return JSONResponse(status_code=status_code,
                         content={
                             "success": True,
-                            "stocks": [stock.to_dict() for stock in stocks] if stocks is not None else None
+                            "stocks": [stock.to_dict() for stock in stocks] if stocks is not None else []
                         })
 
 
