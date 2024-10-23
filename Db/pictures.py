@@ -2,42 +2,84 @@ import Db
 from Entities.Picture import Picture
 
 
-def create(picture: Picture) -> int:
-    Db.cursor.execute(
-        f"INSERT INTO pictures VALUES(NULL, '{picture.description}', '{picture.location}',"
-        f" {picture.aperture}, '{picture.shutter_speed}', {1 if picture.posted else 0}, {1 if picture.printed else 0},"
-        f"'{picture.thumbnail}');"
-    )
+def create(picture: Picture):
+    if _db_load_picture(uid=picture.uid) is not None:
+        raise KeyError(f"Picture {picture.uid} already exists")
+
+    Db.cursor.execute(f"""
+        INSERT INTO pictures VALUES('{picture.uid}',
+                                    '{picture.title}',
+                                    '{picture.description}',
+                                    '{picture.location}',
+                                    {picture.is_location_coordinates},
+                                    '{picture.aperture}',
+                                    '{picture.shutter_speed}',
+                                    '{picture.flickr_post_url}',
+                                    '{picture.filename}',
+                                    '{picture.owner.uid if type(picture.owner) is not str else None}',
+                                    '{picture.film_roll.uid if type(picture.film_roll) is not str else None}',
+                                    '{picture.album.uid if type(picture.album) is not str else None}',
+                                    '{picture.project.uid if type(picture.project) is not str else None}';
+    """)
+
     Db.connection.commit()
-    Db.cursor.execute(f"SELECT last_insert_rowid() as ID FROM pictures;")
-    return Db.cursor.fetchone()[0]
 
 
-def fetch_all() -> list[Picture]:
-    rs = Db.cursor.execute('SELECT * FROM pictures;')
+def fetch(uid: str) -> Picture | None:
+    row = _db_load_picture(uid=uid)
 
-    pictures: list[Picture] = []
-    for row in rs:
-        pictures.append(Picture(db_id=row[0],
-                                description=row[1],
-                                location=row[2],
-                                aperture=row[3],
-                                shutter_speed=row[4],
-                                posted=True if row[5] > 0 else False,
-                                printed=True if row[6] > 0 else False,
-                                thumbnail=row[7]))
+    if row is None:
+        return None
 
-    return pictures
+    return Picture.from_db(row)
 
 
-def fetch(picture_id: int) -> Picture:
-    Db.cursor.execute(f"SELECT * FROM pictures WHERE id=?;", (picture_id,))
-    picture = Db.cursor.fetchone()
-    return Picture(db_id=picture[0],
-                   description=picture[1],
-                   location=picture[2],
-                   aperture=picture[3],
-                   shutter_speed=picture[4],
-                   posted=True if picture[5] > 0 else False,
-                   printed=True if picture[6] > 0 else False,
-                   thumbnail=picture[7])
+def fetch_all() -> list[Picture] | None:
+    items: list[Picture] = []
+
+    rows = Db.cursor.execute("SELECT * FROM pictures;").fetchall()
+
+    if len(rows) == 0 or rows[0] is None:
+        return None
+
+    for row in rows:
+        items.append(Picture.from_db(row))
+
+    return items
+
+
+def update(picture: Picture):
+    if _db_load_picture(uid=picture.uid) is None:
+        raise KeyError(f"Picture {picture.uid} does not exist")
+
+    Db.cursor.execute(f"""
+        UPDATE pictures WHERE uid='{picture.uid}' SET title = '{picture.title}',
+                                                      description = '{picture.description}',
+                                                      location = '{picture.location}',
+                                                      isLocationCoordinates = {picture.is_location_coordinates},
+                                                      aperture = '{picture.aperture}',
+                                                      shutter = '{picture.shutter_speed}',
+                                                      flickrPostUrl = '{picture.flickr_post_url}',
+                                                      filename = '{picture.filename}',
+                                                      filmRoll = '{picture.film_roll}',
+                                                      album = '{picture.album}',
+                                                      project = '{picture.project}';
+    """)
+
+    Db.connection.commit()
+
+
+def delete(uid: str):
+    if _db_load_picture(uid) is None:
+        raise KeyError(f"Picture {uid} does not exist")
+
+    Db.cursor.execute(f"""
+        DELETE FROM pictures WHERE uid='{uid}';
+    """)
+
+    Db.connection.commit()
+
+
+def _db_load_picture(uid: str) -> tuple:
+    return Db.cursor.execute(f"SELECT * FROM pictures WHERE uid = '{uid}'").fetchone()
+

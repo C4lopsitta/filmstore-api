@@ -16,10 +16,10 @@ class Picture:
                  aperture: str | None = None,
                  shutter_speed: str | None = None,
                  flickr_post_url: str | None = None,
-                 owner: User | None = None,
-                 film_roll: FilmRoll | None = None,
-                 album: Album | None = None,
-                 project: Project | None = None,
+                 owner: User | str | None = None,
+                 film_roll: FilmRoll | str | None = None,
+                 album: Album | str | None = None,
+                 project: Project | str | None = None,
                  uid: str | uuid.UUID | None = None):
         if uid is None:
             self.uid = uuid.uuid4().__str__()
@@ -39,6 +39,22 @@ class Picture:
         self.album = album
         self.project = project
 
+    @classmethod
+    def from_db(cls, row: tuple):
+        return cls(uid=row[0],
+                   title=row[1],
+                   description=row[2],
+                   location=row[3],
+                   is_location_coordinates=row[4],
+                   aperture=row[5],
+                   shutter_speed=row[6],
+                   flickr_post_url=row[7],
+                   filename=row[8],
+                   owner=row[9],
+                   film_roll=row[10],
+                   album=row[11],
+                   project=row[12])
+
     def to_dict(self) -> dict:
         return {
             "uid": self.uid,
@@ -50,8 +66,8 @@ class Picture:
             "aperture": self.aperture,
             "shutter_speed": self.shutter_speed,
             "flickr_post_url": self.flickr_post_url,
-            "owner": self.owner.uid,
-            "film_roll": self.film_roll.uid,
-            "album": self.album.uid,
-            "project": self.project.uid
+            "owner_uid": self.owner.uid if type(self.owner) is User else self.owner,
+            "film_roll": self.film_roll.uid if type(self.film_roll) is FilmRoll else self.film_roll,
+            "album": self.album.uid if type(self.album) is Album else self.album,
+            "project": self.project.uid if type(self.project) is Project else self.project,
         }
