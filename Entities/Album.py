@@ -7,7 +7,7 @@ class Album():
     def __init__(self,
                  name: str,
                  is_shared: bool = False,
-                 owner: User | None = None,
+                 owner: User | str | None = None,
                  description: str | None = None,
                  uid: str | uuid.UUID | None = None):
         if uid is None:
@@ -20,11 +20,19 @@ class Album():
         self.owner = owner
         self.description = description
 
+    @classmethod
+    def from_db(cls, row: tuple):
+        return cls(uid=row[0],
+                   name=row[1],
+                   description=row[2],
+                   owner=row[3],
+                   is_shared=row[4],)
+
     def to_dict(self) -> dict:
         return {
             "uid": self.uid,
             "name": self.name,
             "is_shared": self.is_shared,
-            "owner": self.owner,
+            "owner_uid": self.owner.uid if type(self.owner) is User else self.owner,
             "description": self.description
         }
