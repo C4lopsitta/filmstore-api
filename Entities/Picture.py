@@ -67,7 +67,7 @@ class Picture:
             "shutter_speed": self.shutter_speed,
             "flickr_post_url": self.flickr_post_url,
             "owner_uid": self.owner.uid if type(self.owner) is User else self.owner,
-            "film_roll": self.film_roll.uid if type(self.film_roll) is FilmRoll else self.film_roll,
-            "album": self.album.uid if type(self.album) is Album else self.album,
-            "project": self.project.uid if type(self.project) is Project else self.project,
+            "film_roll_uid": self.film_roll.uid if type(self.film_roll) is FilmRoll else self.film_roll,
+            "album_uid": self.album.uid if type(self.album) is Album else self.album,
+            "project_uid": self.project.uid if type(self.project) is Project else self.project,
         }

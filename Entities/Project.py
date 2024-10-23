@@ -6,7 +6,7 @@ from Entities.User import User
 class Project():
     def __init__(self,
                  name: str,
-                 owner: User | None = None,
+                 owner: User | str | None = None,
                  description: str | None = None,
                  location: str | None = None,
                  is_shared: bool = False,
@@ -23,11 +23,21 @@ class Project():
         self.is_shared = is_shared
         self.is_location_coordinates = is_location_coordinates
 
+    @classmethod
+    def from_db(cls, row: tuple):
+        return cls(uid=row[0],
+                   name=row[1],
+                   description=row[2],
+                   location=row[3],
+                   is_location_coordinates=row[4],
+                   is_shared=row[5],
+                   owner=row[6])
+
     def to_dict(self) -> dict:
         return {
             "uid": self.uid,
             "name": self.name,
-            "owner": self.owner,
+            "owner_uid": self.owner.uid if type(self.owner) is User else self.owner,
             "description": self.description,
             "location": self.location,
             "is_shared": self.is_shared,
