@@ -26,20 +26,20 @@ class FilmFormat(Enum):
 class FilmStockVariant:
     def __init__(self,
                  iso: int,
-                 format_: FilmFormat,
+                 format: FilmFormat | int,
                  uid: str | uuid.UUID | None = None):
         if uid is None:
             self.uid = uuid.uuid4().__str__()
         else:
             self.uid = uid.__str__() if type(uid) is uuid.UUID else uuid.UUID(uid).__str__()
         self.iso = iso
-        self.format = format_
+        self.format = format if type(format) is FilmFormat else FilmFormat(format)
 
     @classmethod
     def from_db(cls, row):
         return cls(uid=row[0],
                    iso=row[2],
-                   format_=FilmFormat(row[3]))
+                   format=FilmFormat(row[3]))
 
     def to_dict(self):
         return {
@@ -52,7 +52,7 @@ class FilmStockVariant:
 class FilmStock:
     def __init__(self,
                  name: str,
-                 emulsion_type: FilmEmulsionType,
+                 emulsion_type: FilmEmulsionType | int,
                  variants: list[FilmStockVariant] = [],
                  uid: str | uuid.UUID | None = None,
                  info: str | None = None):
@@ -61,7 +61,7 @@ class FilmStock:
         else:
             self.uid = uid.__str__() if type(uid) is uuid.UUID else uuid.UUID(uid).__str__()
         self.name: str = name
-        self.emulsion_type: FilmEmulsionType = emulsion_type
+        self.emulsion_type: FilmEmulsionType = emulsion_type if type(emulsion_type) is FilmEmulsionType else FilmEmulsionType(emulsion_type)
         self.variants: list[FilmStockVariant] = variants
         self.info: str = info
 

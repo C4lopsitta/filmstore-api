@@ -31,6 +31,17 @@ def create(film_stock: FilmStock):
     Db.connection.commit()
 
 
+def fetch_parent_by_variant(uid: str) -> FilmStock | None:
+    row = Db.cursor.execute(f"""
+        SELECT * FROM filmStockVariants WHERE uid = '{uid}';
+    """)
+
+    if row is None:
+        return None
+
+    return fetch(uid=row[1])
+
+
 def fetch(uid: str | uuid.UUID) -> FilmStock | None:
     # Check if it exists, if it's there, load it and then load the variants
     row = _db_load_stock(uid=uid)
