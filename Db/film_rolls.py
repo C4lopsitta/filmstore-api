@@ -4,99 +4,77 @@ from Entities.Picture import Picture
 
 
 def create(film_roll: FilmRoll):
-    pass
+    if _db_load_roll(uid=film_roll.uid) is not None:
+        raise KeyError(f"Roll {film_roll.uid} already exists")
 
-def _create(filmroll: FilmRoll) -> int:
-    Db.cursor.execute("INSERT INTO filmrolls VALUES(NULL, ?, ?, ?, ?)",
-                      (filmroll.film.db_id, filmroll.archival_identifier, filmroll.status.value, filmroll.camera))
+    Db.cursor.execute(f"""
+        INSERT INTO filmRolls VALUES('{film_roll.uid}',
+                                     '{film_roll.archival_id}',
+                                     '{film_roll.date_start_shooting}',
+                                     '{film_roll.date_end_shooting}',
+                                     '{film_roll.stock.uid}',
+                                     '{film_roll.camera.uid}',
+                                     '{film_roll.project.uid}',
+                                     '{film_roll.album.uid}',
+                                     '{film_roll.owner.uid}',
+                                     {film_roll.is_shared})
+    """)
+
     Db.connection.commit()
 
-    Db.cursor.execute("SELECT last_insert_rowid() as ID FROM filmrolls;")
-    filmroll_id = Db.cursor.fetchone()[0]
 
-    for picture in filmroll.pictures:
-        Db.cursor.execute(f"INSERT INTO pic_film_rel VALUES(NULL, ?, ?)", (filmroll_id, picture.db_id))
+def fetch(uid: str) -> FilmRoll | None:
+    row = _db_load_roll(uid=uid)
+
+    if row is None:
+        return None
+
+    return FilmRoll.from_db(row=row)
+
+
+def fetch_all() -> list[FilmRoll] | None:
+    rolls: list[FilmRoll] = []
+
+    rows = Db.cursor.execute("SELECT * FROM filmRolls;").fetchall()
+
+    if len(rows) == 0 or rows[0] is None:
+        return None
+
+    for row in rows:
+        rolls.append(FilmRoll.from_db(row=row))
+
+    return rolls
+
+
+def update(film_roll: FilmRoll):
+    if _db_load_roll(uid=film_roll.uid) is None:
+        raise KeyError(f"Roll {film_roll.uid} does not exist")
+
+    Db.cursor.execute(f"""
+        UPDATE filmRolls WHERE uid='{film_roll.uid}' SET archival_id='{film_roll.archival_id}',
+                                                         stock='{film_roll.stock.uid}',
+                                                         camera='{film_roll.camera.uid}',
+                                                         project='{film_roll.project.uid}',
+                                                         album='{film_roll.album.uid}',
+                                                         isShared='{film_roll.is_shared}'
+                                                         startShooting='{film_roll.date_start_shooting}',
+                                                         endShooting='{film_roll.date_end_shooting}';
+    """)
 
     Db.connection.commit()
 
-    return filmroll_id
+
+def delete(uid: str):
+    if _db_load_roll(uid) is None:
+        raise KeyError(f"Roll {uid} does not exist")
+
+    Db.cursor.execute(f"""
+        DELETE FROM filmRolls WHERE uid='{uid}';
+    """)
+
+    Db.connection.commit()
 
 
-def _fetch(filmroll_id: int) -> FilmRoll:
-    rows = Db.cursor.execute(
-        f"SELECT pictures.* FROM pictures, pic_film_rel WHERE pic_film_rel.filmroll = {filmroll_id} AND pic_film_rel.picture = pictures.id;"
-    )
+def _db_load_roll(uid: str) -> tuple:
+    return Db.cursor.execute(f"SELECT * FROM filmRolls WHERE uid = '{uid}'").fetchone()
 
-    pictures: list[Picture] = []
-
-    for row in rows:
-        pictures.append(Picture(db_id=row[0],
-                                description=row[1],
-                                location=row[2],
-                                aperture=row[3],
-                                shutter_speed=row[4],
-                                posted=True if row[5] == 1 else False,
-                                printed=True if row[6] == 1 else False,
-                                thumbnail=row[7]))
-
-    Db.cursor.execute(f"SELECT * FROM filmrolls WHERE id={filmroll_id};")
-
-    row = Db.cursor.fetchone()
-
-    film_id = row[1]
-
-    return FilmRoll(db_id=row[0],
-                    film=Db.film_stocks.fetch(film_id),
-                    archival_identifier=row[2],
-                    status=row[3],
-                    pictures=pictures,
-                    camera=row[4])
-
-
-def _fetch_all(stock_filter: int) -> list[FilmRoll]:
-    if stock_filter == 0:
-        rows = Db.cursor.execute('SELECT * FROM filmrolls;')
-    else:
-        rows = Db.cursor.execute(f"SELECT * FROM filmrolls WHERE film = {stock_filter};")
-
-    filmrolls: list[FilmRoll] = []
-
-    rolls_rows = []
-
-    for row in rows:
-        rolls_rows.append(row)
-
-    for row in rolls_rows:
-        print(row)
-        pictures: list[Picture] = []
-        if stock_filter == 0:
-            picrows = Db.cursor.execute(
-                f"SELECT pictures.* FROM pictures, pic_film_rel WHERE "
-                f"pic_film_rel.filmroll = {row[0]} "
-                f"AND pic_film_rel.picture = pictures.id;"
-            )
-        else:
-            picrows = Db.cursor.execute(
-                f"SELECT pictures.* FROM pictures, pic_film_rel, filmrolls WHERE "
-                f"pic_film_rel.filmroll = {row[0]} "
-                f"AND pic_film_rel.picture = pictures.id AND "
-                f"filmrolls.film = {stock_filter};"
-            )
-
-        for picrow in picrows:
-            pictures.append(Picture(db_id=picrow[0],
-                                    description=picrow[1],
-                                    location=picrow[2],
-                                    aperture=picrow[3],
-                                    shutter_speed=picrow[4],
-                                    posted=True if picrow[5] == 1 else False,
-                                    printed=True if picrow[6] == 1 else False,
-                                    thumbnail=picrow[7]))
-        filmrolls.append(FilmRoll(db_id=row[0],
-                                  film=Db.film_stocks.fetch(row[1]),
-                                  archival_identifier=row[2],
-                                  pictures=pictures,
-                                  status=DevelopmentStatus(row[3]),
-                                  camera=row[4]))
-
-    return filmrolls

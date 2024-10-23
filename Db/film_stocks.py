@@ -72,6 +72,8 @@ def update(stock: FilmStock) -> None:
         UPDATE filmStocks WHERE uid = '{stock.uid}' SET name = '{stock.name}', info = '{stock.info}', emulsion_type = '{stock.emulsion_type}';
     """)
 
+    Db.connection.commit()
+
 
 def delete(uid: str):
     if _db_load_stock(uid=uid) is None:
@@ -81,9 +83,11 @@ def delete(uid: str):
         DELETE FROM filmStocks WHERE uid = '{uid}';
     """)
 
+    Db.connection.commit()
+
 
 def _db_load_stock(uid: str) -> tuple:
-    return Db.cursor.execute(f"SELECT * FROM filmStocks WHERE uid = '{uid}';").fetchall()
+    return Db.cursor.execute(f"SELECT * FROM filmStocks WHERE uid = '{uid}';").fetchone()
 
 
 def _load_variants(uid: str) -> list[FilmStockVariant]:
