@@ -3,7 +3,10 @@ from Entities.FilmRoll import FilmRoll, DevelopmentStatus
 from Entities.Picture import Picture
 
 
-def create(filmroll: FilmRoll) -> int:
+def create(film_roll: FilmRoll):
+    pass
+
+def _create(filmroll: FilmRoll) -> int:
     Db.cursor.execute("INSERT INTO filmrolls VALUES(NULL, ?, ?, ?, ?)",
                       (filmroll.film.db_id, filmroll.archival_identifier, filmroll.status.value, filmroll.camera))
     Db.connection.commit()
@@ -19,7 +22,7 @@ def create(filmroll: FilmRoll) -> int:
     return filmroll_id
 
 
-def fetch(filmroll_id: int) -> FilmRoll:
+def _fetch(filmroll_id: int) -> FilmRoll:
     rows = Db.cursor.execute(
         f"SELECT pictures.* FROM pictures, pic_film_rel WHERE pic_film_rel.filmroll = {filmroll_id} AND pic_film_rel.picture = pictures.id;"
     )
@@ -50,7 +53,7 @@ def fetch(filmroll_id: int) -> FilmRoll:
                     camera=row[4])
 
 
-def fetch_all(stock_filter: int) -> list[FilmRoll]:
+def _fetch_all(stock_filter: int) -> list[FilmRoll]:
     if stock_filter == 0:
         rows = Db.cursor.execute('SELECT * FROM filmrolls;')
     else:
