@@ -10,7 +10,7 @@ An API to access an SQLite DB on a raspberry that manages my film rolls so i can
 > [!Note]
 > While technically supported by the DB, right now no authentication is enforced as the API is broken and needs to be 
 > updated to use the new DB functions.
-- [ ] Film stock grouping (to group multiple versions of the same stock, like a group for Kodak Portra that contains all the ISOs and formats)
+- [X] Film stock grouping (to group multiple versions of the same stock, like a group for Kodak Portra that contains all the ISOs and formats)
 - [X] Projects to group images or rolls
 - [X] Non-film images to allow for general image backups
 - [X] Image albums
