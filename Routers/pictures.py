@@ -4,6 +4,7 @@ import uuid
 from fastapi import APIRouter, UploadFile, Request
 from fastapi.responses import JSONResponse, FileResponse
 
+from Config.config import Config
 from Entities.Picture import ImageMimeType
 
 router = APIRouter()
