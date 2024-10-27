@@ -39,6 +39,7 @@ picture{
 	BOOLEAN isShutterDecimal
 	TEXT flickrPostLink
 	TEXT imageFileName
+	TEXT originalMimeType
 	TEXT owner FK
 }
 

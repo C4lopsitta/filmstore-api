@@ -1,12 +1,10 @@
 {
   "images": {
-    "thumbnail_folder": "pictures/",
-    "temporary_files_folder": ".temp/",
-    "original_folder": null,
+    "thumbnail_folder": "pictures",
+    "temporary_files_folder": ".temp",
+    "original_folder": "originals",
     "allow_raw_upload": true,
-    "allow_raw_post_processing": false,
-    "disable_thumbnail_compression": false,
-    "include_exif_in_image_metadata": true
+    "allow_raw_post_processing": false
   },
   "data": {
     "database_file_name": "./film_store_db.sqlite"

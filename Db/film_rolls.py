@@ -55,14 +55,16 @@ def update(film_roll: FilmRoll):
         raise KeyError(f"Roll {film_roll.uid} does not exist")
 
     Db.cursor.execute(f"""
-        UPDATE filmRolls WHERE uid='{film_roll.uid}' SET archival_id='{film_roll.archival_id}',
-                                                         stock='{film_roll.stock_variant.uid if type(film_roll.stock_variant) is not str else film_roll.stock_variant}',
-                                                         camera='{film_roll.camera.uid if type(film_roll.camera) is not str else film_roll.camera}',
-                                                         project='{film_roll.project.uid if type(film_roll.project) is not str else film_roll.project}',
-                                                         album='{film_roll.album.uid if type(film_roll.album) is not str else film_roll.album}',
-                                                         isShared='{film_roll.is_shared}'
-                                                         startShooting='{film_roll.date_start_shooting}',
-                                                         endShooting='{film_roll.date_end_shooting}';
+        UPDATE filmRolls 
+        SET archival_id='{film_roll.archival_id}',
+            stock='{film_roll.stock_variant.uid if type(film_roll.stock_variant) is not str else film_roll.stock_variant}',
+            camera='{film_roll.camera.uid if type(film_roll.camera) is not str else film_roll.camera}',
+            project='{film_roll.project.uid if type(film_roll.project) is not str else film_roll.project}',
+            album='{film_roll.album.uid if type(film_roll.album) is not str else film_roll.album}',
+            isShared='{film_roll.is_shared}',
+            startShooting='{film_roll.date_start_shooting}',
+            endShooting='{film_roll.date_end_shooting}'
+        WHERE uid='{film_roll.uid}';
     """)
 
     Db.connection.commit()

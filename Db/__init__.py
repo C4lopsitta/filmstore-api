@@ -110,6 +110,7 @@ CREATE TABLE IF NOT EXISTS pictures(
     filmRoll VARCHAR(32),
     album VARCHAR(32),
     project VARCHAR(32),
+    imageMimeType TEXT,
     FOREIGN KEY (owner) REFERENCES users(uid) ON DELETE CASCADE,
     FOREIGN KEY (album) REFERENCES albums(uid) ON DELETE SET NULL,
     FOREIGN KEY (filmRoll) REFERENCES filmRolls(uid) ON DELETE SET NULL,

@@ -20,7 +20,7 @@ class FilmRoll:
                  date_start_shooting: str,
                  date_end_shooting: str,
                  stock: Entities.FilmStockVariant | str,
-                 development_status: DevelopmentStatus = DevelopmentStatus.UNUSED,
+                 development_status: DevelopmentStatus | int = DevelopmentStatus.UNUSED,
                  is_shared: bool = False,
                  camera: Entities.Camera | str | None = None,
                  project: Entities.Project | str | None = None,
@@ -41,7 +41,7 @@ class FilmRoll:
         self.date_start_shooting = date_start_shooting
         self.date_end_shooting = date_end_shooting
         self.is_shared = is_shared
-        self.development_status = development_status
+        self.development_status = development_status if type(development_status) is DevelopmentStatus else DevelopmentStatus(development_status)
 
     @classmethod
     def from_db(cls,

@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
-from starlette.requests import Request
+from fastapi.requests import Request
 
 import Db
 from Entities import FilmStock, FilmStockVariant
@@ -45,9 +45,17 @@ def get_film_stock_variant(variant_uid: str):
 
 @router.get("")
 def get_all_film_stocks():
-    stocks = Db.film_stocks.fetch_all()
+    try:
+        stocks = Db.film_stocks.fetch_all()
+    except Exception as e:
+        return JSONResponse(status_code=500,
+                            content={
+                                "success": False,
+                                "error": e.__str__()
+                            })
 
     status_code = 204 if stocks is None or len(stocks) == 0 else 200
+    stocks = stocks if stocks is not None else []
 
     return JSONResponse(status_code=status_code,
                         content={
@@ -132,7 +140,7 @@ def delete_film_stock(uid: str):
     try:
         Db.film_stocks.delete(uid)
     except KeyError as kerr:
-        return JSONResponse(status_code=400,
+        return JSONResponse(status_code=404,
                             content={
                                 "success": False,
                                 "error": f"Stock {uid} not found"
@@ -158,7 +166,7 @@ def delete_film_stock_variant(stock_uid: str, variant_uid: str):
         return JSONResponse(status_code=400,
                             content={
                                 "success": False,
-                                "error": f"Stock {uid} not found"
+                                "error": f"Stock {stock_uid} not found"
                             })
     except Exception as e:
         return JSONResponse(status_code=500,

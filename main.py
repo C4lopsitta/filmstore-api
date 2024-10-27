@@ -66,41 +66,6 @@ async def get_api_config():
     )
 
 
-@app.get("/api/v1/film_rolls")
-async def list_filmrolls(stock: int = 0):
-    try:
-        film_rolls = Db.film_rolls.fetch_all(stock_filter=stock)
-    except Exception as e:
-        print(e)
-        return JSONResponse(status_code=500, content={
-            "success": False,
-            "error": str(e)
-        })
-
-    return JSONResponse(status_code=200, content={
-        "success": True,
-        "filmrolls": [filmroll.to_dict() for filmroll in film_rolls]
-    })
-
-
-@app.get("/api/v1/film_rolls/{filmrollid}")
-async def get_film_roll(roll_id: int):
-    try:
-        film_roll = Db.film_rolls.fetch(filmroll_id=roll_id)
-    except Exception as e:
-        return JSONResponse(status_code=500, content={"success": False, "error": str(e)})
-
-    return JSONResponse(status_code=200, content={
-        "success": True,
-        "id": roll_id,
-        "film": film_roll.film.to_dict(),
-        "pictures": [picture.db_id for picture in film_roll.pictures],
-        "filmroll_status": film_roll.status,
-        "camera": film_roll.camera,
-        "identifier": film_roll.archival_identifier
-    })
-
-
 @app.get("/api/v1/pictures")
 async def list_pictures():
     try:
@@ -173,15 +138,6 @@ async def get_picture(filename: str):
 
 @app.put("/api/v1/pictures")
 async def upload_image_file(request: UploadFile):
-    use_processing = True if request.headers["Filmstore-Postprocess-Negative"] in ["True", "true"] else False
-    postprocessing_type = request.headers["Filmstore-Postprocess-Type"]
-
-    if use_processing and not config.allow_raw_post_processing:
-        return JSONResponse(status_code=400, content={
-            "success": False,
-            "error": "Postprocessing is not allowed"
-        })
-
     if request.content_type not in mime_file_extension.keys():
         original_file_ext: str = mime_file_extension[request.content_type]
 
@@ -256,31 +212,3 @@ async def upload_picture(request):
         "success": True,
         "picture_id": insert_id
     })
-
-
-@app.post("/api/v1/film_rolls")
-async def add_film_roll(request: Request):
-    req_json = await request.json()
-
-    pictures = [Picture(thumbnail="", db_id=id) for id in req_json["pictures"]]
-    film = FilmStock(db_id=req_json["film"], name="", iso=0, development_info="", type=FilmEmulsionType.UNDEFINED)
-
-    filmroll = FilmRoll(camera=req_json["camera"],
-                        archival_identifier=req_json["identifier"],
-                        status=DevelopmentStatus(req_json["status"]),
-                        pictures=pictures,
-                        film=film)
-
-    try:
-        id = Db.film_rolls.create(filmroll=filmroll)
-    except Exception as e:
-        return JSONResponse(status_code=500, content={
-            "success": False,
-            "error": str(e)
-        })
-
-    return JSONResponse(status_code=201, content={
-        "success": True,
-        "filmroll_id": id
-    })
-

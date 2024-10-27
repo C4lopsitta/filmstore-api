@@ -19,7 +19,8 @@ def create(picture: Picture):
                                     '{picture.owner.uid if type(picture.owner) is not str else None}',
                                     '{picture.film_roll.uid if type(picture.film_roll) is not str else None}',
                                     '{picture.album.uid if type(picture.album) is not str else None}',
-                                    '{picture.project.uid if type(picture.project) is not str else None}';
+                                    '{picture.project.uid if type(picture.project) is not str else None}',
+                                    '{picture.image_mime_type.value if type(picture.image_mime_type) is not str else picture.image_mime_type}';
     """)
 
     Db.connection.commit()

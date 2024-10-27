@@ -1,10 +1,47 @@
 import uuid
+from enum import Enum
+
 import Entities
+
+class _ImageMime():
+    def __init__(self,
+                 mime: str,
+                 is_raw: bool,
+                 extension: str):
+        self.mime = mime
+        self.is_raw = is_raw
+        self.extension = extension
+
+
+class ImageMimeType(Enum):
+    """
+    Enumeration of supported image mime types. Values are tuples composed by the str mime type and a bool. When True the
+    format is to be considered RAW, when False the format is to be considered compressed.
+    """
+    UNDEFINED = _ImageMime("", False, "")
+    JPEG = _ImageMime("image/jpeg", False, "jpeg")
+    PNG = _ImageMime("image/png", False, "png")
+    HEIC = _ImageMime("image/heic", False, "heic")
+    TIFF = _ImageMime("image/tiff", True, "tiff")
+    NEF = _ImageMime("image/x-nikon-nef", True, "nef")
+    DNG = _ImageMime("image/x-adobe-dng", True, "dng")
+    CR3 = _ImageMime("image/x-canon-cr3", True, "cr3")
+    CR2 = _ImageMime("image/x-canon-cr2", True, "cr2")
+    CRW = _ImageMime("image/x-canon-crw", True, "crw")
+
+    @classmethod
+    def from_str(cls, mime_type: str):
+        for mime in ImageMimeType.__members__.values():
+            if mime.value.mime == mime_type:
+                return mime
+        raise Exception("Unsupported image mime type.")
+
 
 
 class Picture:
     def __init__(self,
                  filename: str,
+                 image_mime_type: ImageMimeType | str,
                  title: str | None = None,
                  description: str | None = None,
                  location: str | None = None,
@@ -23,6 +60,7 @@ class Picture:
             self.uid = uid.__str__() if type(uid) is uuid.UUID else uuid.UUID(uid).__str__()
 
         self.filename = filename
+        self.image_mime_type = image_mime_type if type(image_mime_type) is ImageMimeType else ImageMimeType(image_mime_type)
         self.title = title
         self.description = description
         self.location = location
@@ -49,7 +87,8 @@ class Picture:
                    owner=row[9],
                    film_roll=row[10],
                    album=row[11],
-                   project=row[12])
+                   project=row[12],
+                   image_mime_type=row[13])
 
     def to_dict(self) -> dict:
         return {
@@ -57,6 +96,7 @@ class Picture:
             "filename": self.filename,
             "title": self.title,
             "description": self.description,
+            "image_mime_type": self.image_mime_type.value,
             "location": self.location,
             "is_location_coordinates": self.is_location_coordinates,
             "aperture": self.aperture,
